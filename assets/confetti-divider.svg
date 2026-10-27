@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="80" viewBox="0 0 1200 80">
+  <rect width="1200" height="80" fill="none"/>
+  <g>
+    <circle cx="60" cy="10" r="10" fill="#FF6B6B"><animate attributeName="cy" values="10;60;10" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="180" cy="40" r="7" fill="#FFD93D"><animate attributeName="cy" values="40;15;40" dur="2.4s" repeatCount="indefinite"/></circle>
+    <circle cx="320" cy="15" r="9" fill="#6BCB77"><animate attributeName="cy" values="15;55;15" dur="3.6s" repeatCount="indefinite"/></circle>
+    <circle cx="480" cy="45" r="8" fill="#4D96FF"><animate attributeName="cy" values="45;12;45" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="640" cy="12" r="10" fill="#FF6B6B"><animate attributeName="cy" values="12;58;12" dur="3.2s" repeatCount="indefinite"/></circle>
+    <circle cx="800" cy="42" r="7" fill="#FFD93D"><animate attributeName="cy" values="42;16;42" dur="2.6s" repeatCount="indefinite"/></circle>
+    <circle cx="940" cy="18" r="9" fill="#6BCB77"><animate attributeName="cy" values="18;56;18" dur="3.4s" repeatCount="indefinite"/></circle>
+    <circle cx="1080" cy="44" r="8" fill="#4D96FF"><animate attributeName="cy" values="44;14;44" dur="3s" repeatCount="indefinite"/></circle>
+    <rect x="115" y="55" width="14" height="8" rx="2" fill="#FF6B6B"><animateTransform attributeName="transform" type="rotate" from="0 122 59" to="360 122 59" dur="4s" repeatCount="indefinite"/></rect>
+    <rect x="400" y="58" width="14" height="8" rx="2" fill="#FFD93D"><animateTransform attributeName="transform" type="rotate" from="360 407 62" to="0 407 62" dur="4.5s" repeatCount="indefinite"/></rect>
+    <rect x="720" y="56" width="14" height="8" rx="2" fill="#6BCB77"><animateTransform attributeName="transform" type="rotate" from="0 727 60" to="360 727 60" dur="3.8s" repeatCount="indefinite"/></rect>
+    <rect x="1010" y="58" width="14" height="8" rx="2" fill="#4D96FF"><animateTransform attributeName="transform" type="rotate" from="360 1017 62" to="0 1017 62" dur="4.2s" repeatCount="indefinite"/></rect>
+  </g>
+</svg>
