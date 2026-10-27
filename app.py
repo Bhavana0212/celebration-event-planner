@@ -140,7 +140,7 @@ def render_home(plan: Plan | None) -> None:
     # planning sites (white space, simple navigation, no clutter).
     st.caption("CELEBRATION & EVENT PLANNER  ·  HACK2SKILL CHALLENGE 5")
     if os.path.exists("assets/hero-banner.webp"):
-        st.image("assets/hero-banner.webp", use_container_width=True,
+        st.image("assets/hero-banner.webp", width="stretch",
                  caption="Birthdays, weddings, festivals and more — planned in one place.")
     st.title("Plan a celebration, without the stress.")
     st.write("Birthdays, weddings, festivals and community events — tell us about "
@@ -156,6 +156,42 @@ def render_home(plan: Plan | None) -> None:
         st.session_state.pop("ai_text", None)
         st.rerun()
     st.caption("Or create your own plan from the form on the left.")
+    st.subheader("Explore everything — tap any card, no searching in the sidebar")
+    st.caption("If you have no plan yet, tapping a card opens it with a sample birthday plan, "
+               "so you can see every feature at first look. Then create your own plan from the sidebar form.")
+    quick = {
+        "Plan": "Budget split, checklist, risks, logistics and menu.",
+        "Guests & Invites": "Guest list, RSVP, invitations, WhatsApp, email and QR.",
+        "Budget & Expenses": "Planned vs actual spending, paid/unpaid, reports.",
+        "Food & Cake": "Menu, dietary-safe dishes, cake size, leftover tracker.",
+        "Music & Games": "Playlist, song requests, games, quiz, scores, lucky draw.",
+        "Kids": "Age-wise activities, themes, goodie bags, safety checklist.",
+        "Decor & Design": "Themes, colours, decor planners and shopping list.",
+        "Vendors & Shopping": "Sample vendors, your vendors, shopping cart (estimates).",
+        "Seating & Floor Plan": "Group-wise seating and a 2D floor-plan schematic.",
+        "Live Event Day": "Run sheet, check-in, polls, announcements, incidents.",
+        "Post-Event & Memories": "Photos, collage, guestbook, gifts, final report.",
+        "AI Assistant": "Ask about your event, get ideas and budget tips.",
+        "Profile & Settings": "Your local profile, backup/restore, pricing preview.",
+    }
+    cols = st.columns(2)
+    for i, (section, desc) in enumerate(quick.items()):
+        with cols[i % 2].container(border=True):
+            st.write(f"**{section}**")
+            st.write(desc)
+            if st.button(f"Open {section}", key=f"quick_{section}"):
+                if plan is None:
+                    req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
+                                       "Toronto", "Fun & Playful", (), (), False,
+                                       "Space theme, kids love science",
+                                       event_name="Ava's 10th Birthday Bash", currency="CAD")
+                    st.session_state["theme"] = "Space"
+                    st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
+                # Do NOT set nav_section here: the sidebar radio with that
+                # key is already instantiated by the time Home renders.
+                # main() picks pending_section up before creating the radio.
+                st.session_state["pending_section"] = section
+                st.rerun()
     if plan is not None:
         st.success(f"Current event: **{plan.request.event_name or plan.request.event_type}** — "
                    f"{plan.days_left} days to go. Use the sections on the left to manage it.")
@@ -1010,6 +1046,10 @@ def main() -> None:
         except ValidationError as exc:
             st.error(f"Please fix: {exc}")
     plan = plan_or_none()
+    # Quick-access cards on Home set pending_section; apply it BEFORE
+    # the radio widget is created, otherwise Streamlit rejects the change.
+    if st.session_state.get("pending_section"):
+        st.session_state["nav_section"] = st.session_state.pop("pending_section")
     with st.sidebar:
         section = st.radio("Navigate", SECTIONS, key="nav_section")
         st.divider()
