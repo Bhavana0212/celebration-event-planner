@@ -1,0 +1,98 @@
+# Feature coverage — honest map for v3
+
+This file maps the requested Basic → Ultra-Advanced list to what v3
+actually does, what is partial / simulated, and what is deliberately NOT
+claimed yet. Do not use this file to claim a feature that is marked Next phase.
+
+## Implemented and working in v3
+
+- **Level 1 — Basic:** Home, local profile, create/edit/duplicate/delete
+  (in-session) events, 8 occasions, date/time, venue, guest count, dashboard,
+  multiple events, checklist add/tick, countdown, calendar (.ics), notes,
+  reminders, budget calculator, mobile-friendly Streamlit layout.
+- **Level 2 — Planning:** Themes + colour palettes, inspiration notes,
+  mood-board notes, decor planners (balloon, flower, stage, table, lighting,
+  entrance, DIY), decoration shopping list + budget, indoor/outdoor,
+  venue comparison (sample directory), seating planner, 2D floor-plan
+  schematic, timeline builder (engine + custom tasks).
+- **Level 3 — Budget & finance:** 18 categories, estimated vs actual,
+  paid / unpaid / advance, vendor quotations, remaining budget, per-guest
+  cost, warning alerts, receipt names recorded, CSV + PDF expense report,
+  charts, shared budget (collaborator names).
+- **Level 4 — Guests & invitations:** Guest name/email/phone, groups,
+  categories, invitation templates + custom text, WhatsApp link, email link,
+  RSVP Accept/Decline/Maybe/Pending, plus-one, dietary, accessibility,
+  kids count, reminders, QR code, check-in, attendance report, seating
+  assignment, thank-you template.
+- **Level 5 — Food & catering:** Menu planner by meal, cake flavour + size
+  calculator, beverages, kids' menu, veg/vegan/allergy menu filtering,
+  guest-based quantities, caterer comparison, buffet/serving schedule,
+  leftover plan.
+- **Level 6 — Music, games & entertainment:** Playlist creator + song
+  requests, music by moment, DJ in vendor directory, games library with
+  age/place filters, rules/materials/duration, quiz builder, scavenger-hunt
+  builder, lucky draw, prize planning (in games + budget), schedule builder.
+- **Level 7 — Kids:** Age-group activities, themes, craft, face painting,
+  magic/clown/bouncy-castle in vendor directory, return-gift planner,
+  goodie-bag checklist, child safety checklist, parent contact in guest list.
+- **Level 8 — Vendors, shopping & logistics:** Vendor directory (sample),
+  ratings/reviews (user notes), price comparison, booking status,
+  contracts (file names recorded), payment milestones via expenses,
+  contact sheet, shopping catalogue + cart (estimates), delivery/return
+  reminders as checklist tasks, parking/transport planner, weather checklist.
+- **Level 9 — Collaboration & automation:** Collaborators with roles
+  (names only), task assignment via guest/vendor names in notes, deadlines
+  and priorities in checklist, file upload names recorded, in-app reminders,
+  overdue alerts, RSVP follow-up list, calendar sync (.ics), PDF export,
+  guest CSV, printable checklist (PDF/Markdown), run sheet, offline access
+  via downloads, change history (in-session edits only).
+- **Level 10 — AI:** Rule-based AI assistant chatbot, AI-generated plan
+  from a prompt, theme/decor/colour recommendations, budget optimisation,
+  expense prediction tips, food quantities, menu, playlist, games by age
+  and group size, timeline, invitation writing, seating suggestions,
+  vendor shortlist (filtered directory), shopping list, weather backup,
+  accessibility suggestions, last-minute problem-solving checklists,
+  plan adjustments on budget/guest-count change, plus optional Gemini
+  creative ideas (capped, with offline fallback).
+- **Level 12 — Post-event:** Photo gallery (session uploads), collage maker,
+  guestbook, wishes, highlights notes, thank-you template, final expense
+  report, vendor reviews, what-worked notes, duplicate event, save as template.
+- **Level 13 — Security/admin (v3 scope):** Input validation, sanitising,
+  length caps, no hard-coded secrets, secrets via env/Streamlit Secrets,
+  private-by-default session data, data export + session delete, accessible
+  interface, responsive layout, SEO page title/description.
+
+## Partial / simulated (labelled as such in the app)
+
+- **Accounts:** Local profile only. No OAuth, email verification, password
+  reset, or two-factor authentication — those need a backend.
+- **Shopping / payments:** Catalogue + cart totals are planning estimates.
+  No checkout, payment gateway, shipping, refunds or commissions.
+- **Vendor bookings:** Directory + status + milestones only. No real
+  booking, contract signature, or vendor dashboard.
+- **Language:** Currency choice is real; full UI translation is not yet
+  done (preference is recorded for future i18n).
+- **Event website:** A downloadable single-file HTML page, not a hosted
+  custom URL. Host it on any static host for a real URL.
+- **Live features:** Live day, polls and check-in work in one browser
+  session. Real multi-user live sync needs a backend / database.
+
+## Next phase — NOT in v3, do not claim these
+
+- 3D venue visualisation, drag-and-drop 3D floor plan, AR decoration preview,
+  virtual venue tours (v3 has a 2D schematic only).
+- Real payment gateway, vendor subscription plans, marketplace commissions,
+  gift-registry purchases, refund/cancellation processing.
+- Real email/SMS sending, push notifications, live multi-user collaboration.
+- Vendor marketplace with real listings, bookings and payouts.
+- Multi-user admin panel, content moderation at scale, analytics backend.
+- Full multi-language UI, regional tradition templates beyond the current
+  theme/vibe system.
+
+## Why this split?
+
+Streamlit Cloud + a single repo can genuinely deliver a full planning
+platform (levels 1–10, plus post-event) with no backend. The next-phase
+items above need a database, authentication, payments and real-time
+infrastructure — building them as fake buttons would mislead users and
+evaluators, so they are listed honestly as the next phase instead.
