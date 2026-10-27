@@ -59,9 +59,9 @@ streamlit run app.py
 pytest -q
 ```
 
-**Live demo:** Streamlit Cloud deployment is in progress for this repo —
-the live URL will be added here once deployment is verified. Until then,
-run it locally with the commands above.
+**Live demo:** https://sufuuqiqx6n4vnqrsufv6q.streamlit.app/
+— deployed on Streamlit Cloud from this repo (branch `main`, file `app.py`).
+No account needed; data stays in your browser session unless you download it.
 
 **Deploy on Streamlit Community Cloud**
 

@@ -96,3 +96,15 @@ platform (levels 1–10, plus post-event) with no backend. The next-phase
 items above need a database, authentication, payments and real-time
 infrastructure — building them as fake buttons would mislead users and
 evaluators, so they are listed honestly as the next phase instead.
+
+## Audit-fix batch (2026-10-27, party theme)
+- Party theme: festive magenta (#C026D3) primary, light pink secondary, white background, hero banner on Home — not a corporate navy theme.
+- Event time: collected in the sidebar, stored on EventRequest, saved with saved events, loaded back, and shown in the saved-event list.
+- Custom tasks in Plan: add / tick off / delete, alongside the engine checklist.
+- Guests: CSV import (Name column, optional Email/Phone/Group/RSVP) with duplicate skip, plus duplicate warning on manual add.
+- Food: numeric leftover tracker (planned vs used = leftover, Packed/Donated/Discarded).
+- Music & Games: score tracker with sorted leaderboard and leader line.
+- Profile: session backup download (JSON) and restore upload — a file the user keeps, not server backup.
+- Catalog: 3 new decor sections, 3 new games, 3 new event templates (Baby Shower, Corporate Party, Graduation).
+- Tests: 112 passed (107 previous + 5 new audit-fix tests).
+- Still next phase, not faked: real accounts/OAuth, real payments/checkout, real vendor bookings, 3D/AR, live multi-user sync, email/SMS sending, hosted custom event URLs.

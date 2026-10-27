@@ -114,6 +114,7 @@ def sidebar_plan_form() -> EventRequest | None:
             currency = st.selectbox("Currency", CURRENCIES, index=0)
             event_date = st.date_input("Event date", date.today() + timedelta(days=60),
                                        min_value=date.today())
+            event_time = st.time_input("Event time (optional)", value=None)
             city = st.text_input("City (optional)", max_chars=MAX_CITY)
             theme = st.text_input("Theme (optional)", "Space")
             vibe = st.selectbox("Vibe", VIBES)
@@ -126,9 +127,11 @@ def sidebar_plan_form() -> EventRequest | None:
     if not submitted:
         return None
     st.session_state["theme"] = theme
+    time_text = event_time.strftime("%H:%M") if event_time else ""
+    st.session_state["event_time"] = time_text
     return EventRequest(event_type, int(guests), float(budget), event_date, city, vibe,
                         tuple(dietary), tuple(access), outdoor, notes,
-                        event_name=event_name, currency=currency)
+                        event_name=event_name, currency=currency, event_time=time_text)
 
 
 def render_home(plan: Plan | None) -> None:
@@ -136,9 +139,13 @@ def render_home(plan: Plan | None) -> None:
     # services as clean cards — the pattern used by professional event
     # planning sites (white space, simple navigation, no clutter).
     st.caption("CELEBRATION & EVENT PLANNER  ·  HACK2SKILL CHALLENGE 5")
+    if os.path.exists("assets/hero-banner.webp"):
+        st.image("assets/hero-banner.webp", use_container_width=True,
+                 caption="Birthdays, weddings, festivals and more — planned in one place.")
     st.title("Plan a celebration, without the stress.")
-    st.write("Tell us about your event, and get a complete plan — budget, guests, "
-             "vendors, food, music and games — in minutes. No account needed.")
+    st.write("Birthdays, weddings, festivals and community events — tell us about "
+             "your party, and get a complete plan — budget, guests, vendors, food, "
+             "music and games — in minutes. No account needed.")
     if st.button("Try a sample birthday plan", type="primary"):
         req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
                            "Toronto", "Fun & Playful", (), (), False,
@@ -211,17 +218,18 @@ def render_home(plan: Plan | None) -> None:
                       "budget": r.budget, "event_date": r.event_date.isoformat(), "city": r.city,
                       "vibe": r.vibe, "dietary": list(r.dietary), "accessibility": list(r.accessibility),
                       "outdoor": r.outdoor, "notes": r.notes, "currency": r.currency,
+                      "event_time": r.event_time,
                       "theme": st.session_state.get("theme", "")})
         st.success("Saved in this session. Download it from Post-Event / Export to keep it.")
     for i, saved in enumerate(store("saved_events", [])):
-        col1, col2, col3 = st.columns([4, 1, 1])
-        col1.write(f"**{saved['event_name'] or saved['event_type']}** — {saved['event_type']}, {saved['event_date']}, {saved['guests']} guests")
+        col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+        col1.write(f"**{saved['event_name'] or saved['event_type']}** — {saved['event_type']}, {saved['event_date']}{', ' + saved['event_time'] if saved.get('event_time') else ''}, {saved['guests']} guests")
         if col2.button("Load", key=f"load_{i}"):
             req = EventRequest(saved["event_type"], saved["guests"], saved["budget"],
                                date.fromisoformat(saved["event_date"]), saved["city"], saved["vibe"],
                                tuple(saved["dietary"]), tuple(saved["accessibility"]),
                                saved["outdoor"], saved["notes"], event_name=saved["event_name"],
-                               currency=saved["currency"])
+                               currency=saved["currency"], event_time=saved.get("event_time", ""))
             st.session_state["theme"] = saved.get("theme", "")
             st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
             st.rerun()
@@ -229,6 +237,9 @@ def render_home(plan: Plan | None) -> None:
             copy = dict(saved)
             copy["event_name"] = (saved["event_name"] or saved["event_type"]) + " (Copy)"
             store("saved_events", []).append(copy)
+            st.rerun()
+        if col4.button("Delete", key=f"del_{i}"):
+            store("saved_events", []).pop(i)
             st.rerun()
 
 
@@ -260,6 +271,29 @@ def render_plan(plan: Plan) -> None:
                             key=f"tasks_{hash(plan.request)}")
     done = int(edited["Done"].sum())
     st.progress(done / len(tdf) if len(tdf) else 0.0, text=f"{done} of {len(tdf)} tasks done")
+    st.subheader("My tasks — add, tick off, delete")
+    st.caption("Your own tasks, in this session, alongside the engine checklist above.")
+    tasks = store("custom_tasks", [])
+    with st.form("add_task", clear_on_submit=True):
+        t1, t2 = st.columns([3, 1])
+        t_title = t1.text_input("Task title *", max_chars=120)
+        t_due = t2.date_input("Due date (optional)", value=None)
+        if st.form_submit_button("Add task"):
+            if t_title.strip():
+                tasks.append({"title": t_title.strip(), "due": t_due.isoformat() if t_due else "", "done": False})
+                st.success(f"Added: {t_title.strip()}")
+    for i, t in enumerate(list(tasks)):
+        c1, c2, c3 = st.columns([1, 5, 1])
+        if c1.checkbox("", value=t["done"], key=f"task_done_{i}"):
+            tasks[i]["done"] = True
+        else:
+            tasks[i]["done"] = False
+        c2.write(f"{t['title']}{' — due ' + t['due'] if t.get('due') else ''}")
+        if c3.button("Delete", key=f"task_del_{i}"):
+            tasks.pop(i)
+            st.rerun()
+    if tasks:
+        st.write(f"{sum(1 for t in tasks if t['done'])} of {len(tasks)} of my tasks done.")
     st.subheader("Risks")
     if not plan.risks:
         st.success("No major risks detected.")
@@ -305,7 +339,9 @@ def render_guests(plan: Plan) -> None:
         kids = c8.number_input("Kids attending", 0, 10, 0)
         dietary = c9.text_input("Dietary / accessibility note", max_chars=120)
         if st.form_submit_button("Add guest"):
-            if name.strip():
+            if name.strip() and any(g.get("Name", "").lower() == name.strip().lower() and g.get("Email", "").lower() == email.strip().lower() for g in guests):
+                st.warning("This guest (same name and email) is already in the list — not added again.")
+            elif name.strip():
                 guests.append({"Name": name.strip(), "Email": email.strip(), "Phone": phone.strip(),
                                "Group": group, "Category": category, "RSVP": rsvp,
                                "PlusOne": int(plus_one), "Kids": int(kids), "Dietary": dietary.strip(),
@@ -313,6 +349,31 @@ def render_guests(plan: Plan) -> None:
                 st.success(f"Added {name.strip()}.")
             else:
                 st.warning("Enter a guest name first.")
+    st.subheader("Import guests from CSV")
+    st.caption("CSV with a Name column (Email, Phone, Group, RSVP optional). Duplicates by name + email are skipped.")
+    csv_file = st.file_uploader("Upload guest CSV", type=["csv"], key="guest_csv")
+    if csv_file is not None and st.button("Import guests"):
+        try:
+            import_df = pd.read_csv(csv_file)
+            if "Name" not in import_df.columns:
+                st.error("CSV needs a Name column.")
+            else:
+                added, skipped = 0, 0
+                for _, row in import_df.iterrows():
+                    nm = str(row.get("Name", "")).strip()
+                    em = str(row.get("Email", "")).strip() if pd.notna(row.get("Email")) else ""
+                    if not nm:
+                        continue
+                    if any(g.get("Name", "").lower() == nm.lower() and g.get("Email", "").lower() == em.lower() for g in guests):
+                        skipped += 1
+                        continue
+                    guests.append({"Name": nm, "Email": em, "Phone": str(row.get("Phone", "")).strip() if pd.notna(row.get("Phone")) else "",
+                                   "Group": str(row.get("Group", "Other")).strip() or "Other", "Category": "Friends", "RSVP": str(row.get("RSVP", "Pending")).strip() or "Pending",
+                                   "PlusOne": 0, "Kids": 0, "Dietary": "", "CheckedIn": False, "Table": 0})
+                    added += 1
+                st.success(f"Imported {added} guest(s), skipped {skipped} duplicate(s).")
+        except Exception as exc:
+            st.error(f"Could not import CSV: {exc}")
     if guests:
         df = pd.DataFrame(guests)
         edited = st.data_editor(df, hide_index=True, use_container_width=True, key="guest_editor",
@@ -466,6 +527,20 @@ def render_food(plan: Plan) -> None:
              "dessert / cake at the main moment, and a late snack if the event runs long.")
     st.write("Leftover plan: pack leftovers in labelled boxes, donate unopened food where local rules allow, "
              "and note actual consumption for next time in Post-Event.")
+    st.subheader("Leftover tracker (numbers, not just a plan)")
+    leftovers = store("leftovers", [])
+    with st.form("add_leftover", clear_on_submit=True):
+        l1, l2, l3, l4 = st.columns(4)
+        l_item = l1.text_input("Item *", max_chars=80)
+        l_planned = l2.number_input("Planned portions", 0, 10000, 0)
+        l_used = l3.number_input("Actually used", 0, 10000, 0)
+        l_action = l4.selectbox("Action", ["Packed", "Donated", "Discarded"])
+        if st.form_submit_button("Add leftover record"):
+            if l_item.strip():
+                leftovers.append({"Item": l_item.strip(), "Planned": int(l_planned), "Used": int(l_used),
+                                  "Leftover": int(l_planned) - int(l_used), "Action": l_action})
+    if leftovers:
+        st.table(leftovers)
     st.subheader("Caterer comparison")
     caterers = [v for v in SAMPLE_VENDORS if v["category"] == "Caterer"]
     if caterers:
@@ -530,6 +605,20 @@ def render_music_games(plan: Plan) -> None:
         winner = lucky_draw_winner(attending)
         st.success(f"Winner: **{winner}**" if winner else "Add attending guests first (Guests & Invites tab).")
     st.caption("Lucky draw is random in this session — use it for fun, not for a paid lottery.")
+    st.subheader("Score tracker & leaderboard")
+    scores = store("game_scores", [])
+    with st.form("add_score", clear_on_submit=True):
+        s1, s2, s3 = st.columns(3)
+        s_team = s1.text_input("Team / player *", max_chars=80)
+        s_game = s2.text_input("Game", max_chars=80)
+        s_pts = s3.number_input("Points", 0, 10000, 0)
+        if st.form_submit_button("Add score"):
+            if s_team.strip():
+                scores.append({"Team / player": s_team.strip(), "Game": s_game.strip(), "Points": int(s_pts)})
+    if scores:
+        board = sorted(scores, key=lambda x: x["Points"], reverse=True)
+        st.table(board)
+        st.success(f"Leader: **{board[0]['Team / player']}** with {board[0]['Points']} points.")
 
 
 def render_kids(plan: Plan) -> None:
@@ -687,7 +776,7 @@ def render_seating(plan: Plan) -> None:
 
 
 def render_live(plan: Plan) -> None:
-    st.subheader("🎤 Live event day dashboard")
+    st.subheader("Live event day dashboard")
     st.write("Use this on event day: run sheet, check-ins, vendor status, announcements and polls.")
     st.subheader("Minute-by-minute run sheet")
     for title, detail in day_schedule(plan.request.event_type):
@@ -735,7 +824,7 @@ def render_live(plan: Plan) -> None:
 
 
 def render_post_event(plan: Plan) -> None:
-    st.subheader("📸 Photo gallery & collage")
+    st.subheader("Photo gallery & collage")
     uploaded = st.file_uploader("Upload event photos (shown only in this session)",
                                 type=["png", "jpg", "jpeg"], accept_multiple_files=True, key="photo_upload")
     photos = store("photos", [])
@@ -819,7 +908,7 @@ def render_post_event(plan: Plan) -> None:
 
 
 def render_ai(plan: Plan) -> None:
-    st.subheader("🤖 AI Assistant — ask about your event")
+    st.subheader("AI Assistant — ask about your event")
     st.write("Rule-based assistant in v3: it answers budget, rain, vendor, games, food and seating "
              "questions with checklists. For creative ideas, use Gemini below (optional, capped).")
     q = st.text_input("Ask a question", placeholder="e.g. What if it rains? How do I save budget?",
@@ -867,7 +956,7 @@ def render_ai(plan: Plan) -> None:
 
 
 def render_profile(plan: Plan | None) -> None:
-    st.subheader("👤 Profile (local, v3)")
+    st.subheader("Profile (local, v3)")
     st.write("v3 profiles are local to this browser session. Real accounts with OAuth, "
              "email verification and two-factor authentication need a backend — see README.")
     profile = store("profile", {"name": "Bhavana Shah", "email": "sbhavana1997@gmail.com", "city": "Toronto"})
@@ -885,6 +974,20 @@ def render_profile(plan: Plan | None) -> None:
         for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
+    st.subheader("Session backup & restore (file you keep)")
+    st.caption("No server backup exists in v3 — download this JSON file to keep your session, and upload it back to restore it.")
+    backup = {k: v for k, v in st.session_state.items() if k in ("saved_events", "real_guests", "custom_vendors", "expenses", "playlist", "custom_tasks", "leftovers", "game_scores")}
+    st.download_button("⬇️ Download session backup (JSON)", json.dumps(backup, default=str, indent=2), "event-planner-backup.json", "application/json")
+    up = st.file_uploader("Restore session backup (JSON)", type=["json"], key="backup_json")
+    if up is not None and st.button("Restore backup"):
+        try:
+            data = json.load(up)
+            for k, v in data.items():
+                if k in ("saved_events", "real_guests", "custom_vendors", "expenses", "playlist", "custom_tasks", "leftovers", "game_scores"):
+                    st.session_state[k] = v
+            st.success("Backup restored in this session.")
+        except Exception as exc:
+            st.error(f"Could not restore backup: {exc}")
     st.subheader("Pricing (preview — no payment taken here)")
     st.table([{"Plan": "Free", "Price": "₹0 / $0", "Includes": "Full planner, guests, budget, exports"},
               {"Plan": "Premium", "Price": "Coming soon", "Includes": "Templates marketplace, advanced analytics, priority support"},
