@@ -8,7 +8,8 @@ APP = str(Path(__file__).resolve().parents[1] / "app.py")
 def test_app_loads_without_errors():
     at = AppTest.from_file(APP, default_timeout=30).run()
     assert not at.exception
-    assert at.title[0].value.endswith("Celebration & Event Planner")
+    # Professional landing headline (see render_home).
+    assert at.title[0].value == "Plan a celebration, without the stress."
 
 
 def test_submitting_form_builds_plan():
