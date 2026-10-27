@@ -68,6 +68,8 @@ class EventRequest:
     # construction (positional or keyword) working unchanged.
     event_name: str = ""
     currency: str = "INR"
+    # Added in the audit fix: event time as "HH:MM" text, default empty.
+    event_time: str = ""
 
     def validated(self, today: date | None = None) -> "EventRequest":
         """Return a sanitised copy, or raise ValidationError listing every problem."""
@@ -94,6 +96,9 @@ class EventRequest:
         if self.currency not in CURRENCIES:
             errors.append("Unknown currency")
 
+        time_text = clean_text(self.event_time, 5)
+        if time_text and not re.match(r"^\d{2}:\d{2}$", time_text):
+            errors.append("Event time must be HH:MM")
         if errors:
             raise ValidationError("; ".join(errors))
         return replace(
@@ -103,6 +108,7 @@ class EventRequest:
             accessibility=access,
             notes=clean_text(self.notes, MAX_NOTES),
             event_name=clean_text(self.event_name, 120),
+            event_time=time_text,
         )
 
     @staticmethod

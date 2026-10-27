@@ -34,6 +34,9 @@ DECOR_SECTIONS = {
     "Table decoration": ["Tablecloth + runner", "Centrepiece", "Place cards"],
     "Lighting": ["Fairy lights", "Spotlights for stage", "Candles / LED candles"],
     "Entrance decoration": ["Welcome sign", "Flower arch", "Photo corner"],
+    "Centrepiece & table numbers": ["Centrepiece per table", "Table numbers / name cards", "Candles / LED candles"],
+    "Backdrop & ceiling": ["Main backdrop", "Ceiling drapes / fairy lights", "Photo booth backdrop"],
+    "Photo booth & welcome sign": ["Photo booth props", "Welcome sign board", "Guest photo corner"],
     "DIY ideas": ["Paper bunting", "Photo wall with prints", "Hand-painted welcome board"],
 }
 
@@ -72,6 +75,9 @@ GAMES_LIBRARY = [
     {"name": "Bingo", "age": "Family", "place": "Indoor", "duration": "20 min", "materials": "Bingo cards, prizes", "budget": "Low"},
     {"name": "Dance Competition", "age": "Teens", "place": "Indoor", "duration": "30 min", "materials": "Music, judges", "budget": "Medium"},
     {"name": "Photo Challenge", "age": "Family", "place": "Indoor", "duration": "20 min", "materials": "Phone camera, prompts", "budget": "Low"},
+    {"name": "Team Building Challenge", "age": "Adults", "place": "Outdoor", "duration": "30 min", "materials": "Team tasks, timer", "budget": "Low"},
+    {"name": "Couples Dance", "age": "Adults", "place": "Indoor", "duration": "20 min", "materials": "Music, dance floor", "budget": "Low"},
+    {"name": "Kids Talent Show", "age": "Kids", "place": "Indoor", "duration": "30 min", "materials": "Stage, music, judges", "budget": "Low"},
 ]
 
 MUSIC_LIBRARY = [
@@ -101,4 +107,7 @@ EVENT_TEMPLATES = [
     {"name": "Wedding — Elegant Gold", "event_type": "Wedding", "guests": 200, "theme": "Elegant Gold"},
     {"name": "Community Festival", "event_type": "Community Event", "guests": 150, "theme": "Rainbow / Fun"},
     {"name": "Anniversary Dinner", "event_type": "Anniversary", "guests": 40, "theme": "Elegant Gold"},
+    {"name": "Baby Shower — Garden", "event_type": "Baby Shower", "guests": 40, "theme": "Garden"},
+    {"name": "Corporate Party — Minimalist", "event_type": "Corporate Party", "guests": 100, "theme": "Minimalist"},
+    {"name": "Graduation — Rainbow / Fun", "event_type": "Graduation", "guests": 60, "theme": "Rainbow / Fun"},
 ]
