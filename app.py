@@ -69,10 +69,10 @@ BUDGET_CATEGORIES = ["Venue", "Catering", "Cake", "Decor", "Music", "Entertainme
                      "Photography", "Videography", "Invitation", "Outfit", "Gifts",
                      "Kids' Activities", "Transport", "Accommodation", "Rental",
                      "Staff", "Taxes & Fees", "Emergency Fund"]
-SECTIONS = ["🏠 Home", "📋 Plan", "👥 Guests & Invites", "💰 Budget & Expenses",
-            "🍰 Food & Cake", "🎵 Music & Games", "🧒 Kids", "🎨 Decor & Design",
-            "🏪 Vendors & Shopping", "🪑 Seating & Floor Plan", "🎤 Live Event Day",
-            "📸 Post-Event & Memories", "🤖 AI Assistant", "⚙️ Profile & Settings"]
+SECTIONS = ["Home", "Plan", "Guests & Invites", "Budget & Expenses",
+            "Food & Cake", "Music & Games", "Kids", "Decor & Design",
+            "Vendors & Shopping", "Seating & Floor Plan", "Live Event Day",
+            "Post-Event & Memories", "AI Assistant", "Profile & Settings"]
 
 
 @st.cache_data(show_spinner=False, max_entries=64)
@@ -104,7 +104,8 @@ def plan_or_none() -> Plan | None:
 
 def sidebar_plan_form() -> EventRequest | None:
     with st.sidebar:
-        st.header("Plan an event")
+        st.header("Start planning")
+        st.caption("Step 1 — Tell us about your event. Step 2 — Get your full plan.")
         with st.form("event_form"):
             event_name = st.text_input("Event name", "Ava's 10th Birthday Bash", max_chars=120)
             event_type = st.selectbox("Event type", EVENT_TYPES)
@@ -131,21 +132,14 @@ def sidebar_plan_form() -> EventRequest | None:
 
 
 def render_home(plan: Plan | None) -> None:
-    st.title("🎉 Celebration & Event Planner")
-    st.subheader("From first idea to last thank-you — plan it all in one place.")
-    st.write("Create an event, invite guests, track budget, book vendors, plan food, "
-             "music and games, run the event day live, and keep the memories afterwards.")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Event types", "8")
-    c2.metric("Budget categories", "18")
-    c3.metric("Sample vendors", str(len(SAMPLE_VENDORS)))
-    c4.metric("Games in library", str(len(GAMES_LIBRARY)))
-    st.markdown("### How it works")
-    a, b, c = st.columns(3)
-    a.write("**1. Tell it your event**\n\nGuests, budget, date, vibe, dietary and accessibility needs.")
-    b.write("**2. Get a full plan**\n\nBudget, checklist, menu, risks, seating, games and music — instantly.")
-    c.write("**3. Run it live**\n\nCheck guests in, track vendors, announce updates, then save memories.")
-    if st.button("✨ Try a sample birthday plan", type="primary"):
+    # Professional landing: one clear headline, one clear action, then
+    # services as clean cards — the pattern used by professional event
+    # planning sites (white space, simple navigation, no clutter).
+    st.caption("CELEBRATION & EVENT PLANNER  ·  HACK2SKILL CHALLENGE 5")
+    st.title("Plan a celebration, without the stress.")
+    st.write("Tell us about your event, and get a complete plan — budget, guests, "
+             "vendors, food, music and games — in minutes. No account needed.")
+    if st.button("Try a sample birthday plan", type="primary"):
         req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
                            "Toronto", "Fun & Playful", (), (), False,
                            "Space theme, kids love science",
@@ -154,7 +148,42 @@ def render_home(plan: Plan | None) -> None:
         st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
         st.session_state.pop("ai_text", None)
         st.rerun()
-    st.markdown("### Event templates")
+    st.caption("Or create your own plan from the form on the left.")
+    if plan is not None:
+        st.success(f"Current event: **{plan.request.event_name or plan.request.event_type}** — "
+                   f"{plan.days_left} days to go. Use the sections on the left to manage it.")
+    with st.container(border=True):
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Event types", "8")
+        c2.metric("Budget categories", "18")
+        c3.metric("Sample vendors", str(len(SAMPLE_VENDORS)))
+        c4.metric("Games in library", str(len(GAMES_LIBRARY)))
+    st.subheader("How it works")
+    a, b, c = st.columns(3)
+    with a.container(border=True):
+        st.write("**1. Tell us about your event**")
+        st.write("Guests, budget, date, vibe, and dietary or accessibility needs.")
+    with b.container(border=True):
+        st.write("**2. Get your full plan**")
+        st.write("Budget, checklist, menu, risks, seating, games and music — instantly.")
+    with c.container(border=True):
+        st.write("**3. Run it live**")
+        st.write("Check guests in, track vendors, share updates, then save memories.")
+    st.subheader("What you get")
+    d, e, f, g = st.columns(4)
+    with d.container(border=True):
+        st.write("**Budget, clearly**")
+        st.write("A split that always adds up to your total, plus actual spending.")
+    with e.container(border=True):
+        st.write("**Guests, organised**")
+        st.write("RSVP, dietary needs, seating and check-in in one list.")
+    with f.container(border=True):
+        st.write("**Vendors, compared**")
+        st.write("Prices, status and contacts — no spreadsheets needed.")
+    with g.container(border=True):
+        st.write("**The day itself**")
+        st.write("A run sheet, live polls and announcements for event day.")
+    st.subheader("Start from a template")
     for t in EVENT_TEMPLATES:
         if st.button(f"Use template: {t['name']}", key=f"tpl_{t['name']}"):
             req = EventRequest(t["event_type"], t["guests"], 100000.0,
@@ -163,11 +192,18 @@ def render_home(plan: Plan | None) -> None:
             st.session_state["theme"] = t["theme"]
             st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
             st.rerun()
-    if plan is not None:
-        st.success(f"Current event: **{plan.request.event_name or plan.request.event_type}** — "
-                   f"{plan.days_left} days to go. Use the sections on the left to manage it.")
+    st.subheader("Questions, answered")
+    with st.expander("Do I need an account to use this?"):
+        st.write("No. Everything works in your browser session, with no sign-up.")
+    with st.expander("Is my event data private?"):
+        st.write("Yes. It stays in this browser session unless you download it. "
+                 "No event is published by this app.")
+    with st.expander("Do I need an AI key?"):
+        st.write("No. Offline ideas work without a key. A Gemini key only adds "
+                 "extra creative ideas, and is optional.")
     st.divider()
-    st.markdown("### My events (this browser session)")
+    st.caption("Built for Hack2Skill Virtual: PromptWars, Challenge 5 · By Bhavana Shah")
+    st.subheader("My events (this browser session)")
     if plan is not None and st.button("💾 Save current event"):
         saved = store("saved_events", [])
         r = plan.request
@@ -872,39 +908,39 @@ def main() -> None:
             st.error(f"Please fix: {exc}")
     plan = plan_or_none()
     with st.sidebar:
-        section = st.radio("Go to", SECTIONS, key="nav_section")
+        section = st.radio("Navigate", SECTIONS, key="nav_section")
         st.divider()
-        st.caption("Celebration & Event Planner v3 • Hack2Skill Challenge 5")
-    if section == "🏠 Home":
+        st.caption("Celebration & Event Planner · Hack2Skill Challenge 5")
+    if section == "Home":
         render_home(plan)
     elif plan is None:
         render_home(None)
         st.warning("Create a plan from the sidebar form (or try a sample plan on Home) to use this section.")
-    elif section == "📋 Plan":
+    elif section == "Plan":
         render_plan(plan)
-    elif section == "👥 Guests & Invites":
+    elif section == "Guests & Invites":
         render_guests(plan)
-    elif section == "💰 Budget & Expenses":
+    elif section == "Budget & Expenses":
         render_budget(plan)
-    elif section == "🍰 Food & Cake":
+    elif section == "Food & Cake":
         render_food(plan)
-    elif section == "🎵 Music & Games":
+    elif section == "Music & Games":
         render_music_games(plan)
-    elif section == "🧒 Kids":
+    elif section == "Kids":
         render_kids(plan)
-    elif section == "🎨 Decor & Design":
+    elif section == "Decor & Design":
         render_decor(plan)
-    elif section == "🏪 Vendors & Shopping":
+    elif section == "Vendors & Shopping":
         render_vendors_shopping(plan)
-    elif section == "🪑 Seating & Floor Plan":
+    elif section == "Seating & Floor Plan":
         render_seating(plan)
-    elif section == "🎤 Live Event Day":
+    elif section == "Live Event Day":
         render_live(plan)
-    elif section == "📸 Post-Event & Memories":
+    elif section == "Post-Event & Memories":
         render_post_event(plan)
-    elif section == "🤖 AI Assistant":
+    elif section == "AI Assistant":
         render_ai(plan)
-    elif section == "⚙️ Profile & Settings":
+    elif section == "Profile & Settings":
         render_profile(plan)
 
 
