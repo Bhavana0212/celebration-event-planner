@@ -41,7 +41,37 @@ h3 { font-size: 1.1rem; font-weight: 700; }
    header stays at the top and footer at the bottom of every page, only the
    middle page content changes. Nav is NOT a dropdown: it is an open,
    horizontal, scrollable bar in one line, current page highlighted. */
-.pro-header { position: sticky; top: 0; z-index: 100; background: #FFF5F9; padding-top: 0.5rem; }
-[data-testid="stRadio"] div[role="radiogroup"] { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 4px; padding-bottom: 6px; scrollbar-width: thin; }
-[data-testid="stRadio"] label { white-space: nowrap; flex-shrink: 0; }
-[data-testid="stRadio"] label[data-checked="true"] { background: #E91E8C; color: #FFFFFF; border-radius: 999px; }
+.pro-header { position: sticky; top: 0; z-index: 100; background: #FFFFFF; padding: 0.75rem 1rem 0.75rem; margin: -0.5rem -1rem 0; box-shadow: 0 2px 12px rgba(233,30,140,0.12); border-bottom: 3px solid #FFB800; }
+.pro-header .pro-brand { font-size: 1.4rem; }
+/* Clean header nav, TOOFAN-style (own layout, no copied logo/artwork):
+   the radio widget must NOT look like a form. Hide its circles, turn
+   every option into a clean header link/pill in one white bar. The
+   checked option is a magenta pill with white text. */
+[data-testid="stRadio"] { background: #FFFFFF; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 6px 8px; margin-bottom: 1rem; }
+[data-testid="stRadio"] div[role="radiogroup"] { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; padding-bottom: 2px; scrollbar-width: thin; }
+[data-testid="stRadio"] label { white-space: nowrap; flex-shrink: 0; padding: 8px 14px !important; border-radius: 999px !important; font-weight: 600; color: #374151; }
+[data-testid="stRadio"] label:hover { background: #FFE4F1; color: #E91E8C; }
+[data-testid="stRadio"] input[type="radio"] { display: none; }
+[data-testid="stRadio"] label[data-checked="true"], [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) { background: #E91E8C !important; color: #FFFFFF !important; }
+/* Wizard / journey progress bar in planner colours, not default blue. */
+[data-testid="stProgress"] > div > div { background: linear-gradient(90deg, #E91E8C, #FFB800) !important; }
+
+/* Progress tracker + clean header (screenshot-reference style, own design):
+   clean white header bar with shadow, logo left, tagline right; below it
+   the open nav bar is the middle "pages" row. The journey tracker is one
+   scrollable line: circles sit ON a connecting line, done = magenta with
+   check, current = gold ring, upcoming = grey number. No copied logo or
+   artwork from the reference screenshots. */
+.progress-tracker { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0; align-items: flex-start; margin: 1rem 0; padding: 0.5rem 0.5rem 0.75rem; background: #FFFFFF; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); scrollbar-width: thin; }
+.track-step { flex: 1 0 76px; text-align: center; position: relative; padding-top: 2px; }
+.track-step::before { content: ""; position: absolute; top: 23px; left: 0; right: 0; height: 4px; background: #E5E7EB; z-index: 0; }
+.track-step:first-child::before { left: 50%; }
+.track-step:last-child::before { right: 50%; }
+.track-step.done::before { background: #E91E8C; }
+.track-step.current::before { background: linear-gradient(90deg, #E91E8C, #FFB800); left: 0; }
+.track-circle { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; border: 2px solid #D1D5DB; color: #6B7280; font-size: 1.1rem; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.track-step.done .track-circle { background: #E91E8C; border-color: #E91E8C; color: #FFFFFF; }
+.track-step.current .track-circle { background: #FFFBEB; border: 3px solid #FFB800; color: #92400E; width: 48px; height: 48px; }
+.track-label { display: block; margin-top: 6px; font-size: 0.75rem; line-height: 1.2; color: #374151; }
+.track-step.upcoming .track-label { color: #6B7280; }
+.track-step.current .track-label { font-weight: 700; color: #1F2937; }
