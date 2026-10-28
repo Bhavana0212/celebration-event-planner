@@ -7,7 +7,8 @@ def test_differentiators_honest():
     assert "does NOT sell tickets" in TEXT
 
 def test_readiness_and_invitation_card():
-    assert "Your plan readiness" in TEXT
+    # Readiness moved into the dashboard (premium polish): same progress, new heading.
+    assert "Your dashboard" in TEXT and "Planning progress" in TEXT
     assert "Stylish invitation preview" in TEXT
 
 def test_rsvp_chart_and_wedding():
