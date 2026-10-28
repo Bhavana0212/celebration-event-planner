@@ -2,27 +2,38 @@
    warm ivory background — Forest was too serious and gave no celebration
    feeling, so the palette is back to festive, but kept clean and consistent.
    Separated from app logic: planner/ = engine, app.py = screens, this = look. */
-.stApp { font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #1F2937; background: #FFF7ED; }
+.stApp { font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #1F2937; background: #FFF5F9; }
 .block-container { max-width: 1180px; padding-top: 2.5rem; padding-bottom: 3rem; }
-.pro-header { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; align-items: center; border-bottom: 3px solid #F59E0B; padding-bottom: 0.75rem; margin-bottom: 1rem; margin-top: 0.5rem; }
-.pro-header .pro-brand { font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 700; color: #C026D3; letter-spacing: -0.02em; white-space: normal; word-break: break-word; }
+.pro-header { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; align-items: center; border-bottom: 3px solid #FFB800; padding-bottom: 0.75rem; margin-bottom: 1rem; margin-top: 0.5rem; }
+.pro-header .pro-brand { font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 700; color: #E91E8C; letter-spacing: -0.02em; white-space: normal; word-break: break-word; }
 .pro-header .pro-tag { font-size: 0.8rem; color: #6B7280; white-space: normal; }
-h1, h2, h3 { color: #831843; letter-spacing: -0.02em; }
+h1, h2, h3 { color: #D6006D; letter-spacing: -0.02em; }
 h1 { font-family: Georgia, "Times New Roman", serif; font-size: 2.1rem; font-weight: 700; line-height: 1.15; }
 h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.45rem; font-weight: 700; margin-top: 1.5rem; border-bottom: 1px solid #FDE68A; padding-bottom: 0.35rem; }
 h3 { font-size: 1.1rem; font-weight: 700; }
 .stButton > button, .stFormSubmitButton > button { border-radius: 14px; padding: 0.6rem 1.4rem; font-weight: 600; border: 1px solid #E5E7EB; min-height: 44px; }
-.stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] { background: linear-gradient(135deg, #C026D3, #DB2777); color: #FFFFFF; border: none; box-shadow: 0 4px 14px rgba(192, 38, 211, 0.3); }
+.stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] { background: linear-gradient(135deg, #E91E8C, #FF7A00); color: #FFFFFF; border: none; box-shadow: 0 4px 14px rgba(233, 30, 140, 0.45); }
 .stButton > button:hover, .stFormSubmitButton > button:hover { transform: translateY(-1px); }
 [data-testid="stMetric"] { background: #FFFFFF; border: 1px solid #FDE68A; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); min-width: 0; }
 [data-testid="stMetricValue"] { font-size: 1.4rem; white-space: normal; word-break: break-word; }
 [data-testid="stExpander"] { border: 1px solid #FDE68A; border-radius: 14px; }
 .stTextInput input, .stNumberInput input, .stSelectbox > div > div, .stTextArea textarea { border-radius: 10px; }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color: #C026D3 !important; box-shadow: 0 0 0 1px #C026D3 !important; }
+.stTextInput input:focus, .stTextArea textarea:focus { border-color: #E91E8C !important; box-shadow: 0 0 0 1px #E91E8C !important; }
 .stAlert { border-radius: 12px; }
-[data-testid="stSidebar"] { background: #FDF2F8; }
+[data-testid="stSidebar"] { background: #FFE4F1; }
 @media (max-width: 640px) {
   .block-container { padding-top: 3rem; padding-left: 1rem; padding-right: 1rem; }
   .pro-brand { font-size: 1.1rem !important; }
   h1 { font-size: 1.7rem; }
 }
+/* Horizontal process graph (journey stepper) + footer bar */
+.stepper { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0.75rem 0; }
+.step { display: flex; align-items: center; gap: 6px; border: 1px solid #FDE68A; border-radius: 999px; padding: 6px 12px; background: #FFFFFF; font-size: 0.85rem; }
+.step.done { background: #FFE4F1; border-color: #E91E8C; }
+.step.current { background: #FFFBEB; border: 2px solid #FFB800; font-weight: 700; }
+.step.upcoming { color: #6B7280; }
+.step-mark { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #F3F4F6; font-size: 0.8rem; font-weight: 700; }
+.step.done .step-mark { background: #E91E8C; color: #FFFFFF; }
+.step.current .step-mark { background: #FFB800; color: #FFFFFF; }
+.step-arrow { color: #E91E8C; font-weight: 700; }
+.pro-footer { border-top: 3px solid #FFB800; padding-top: 0.75rem; margin-top: 2rem; font-size: 0.85rem; color: #6B7280; display: flex; flex-direction: column; gap: 4px; }
