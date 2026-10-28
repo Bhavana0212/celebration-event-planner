@@ -1435,11 +1435,13 @@ def main() -> None:
     # the radio widget is created, otherwise Streamlit rejects the change.
     if st.session_state.get("pending_section"):
         st.session_state["nav_section"] = st.session_state.pop("pending_section")
-    # TOP navigation bar: one dropdown menu at the top of the page, so a
-    # person can pick any page as they like — no sidebar hamburger hunt,
-    # and no 20 radio buttons wrapping on mobile.
-    section = st.selectbox("Navigate to a page", SECTIONS, key="nav_section",
-                           help="One menu for every page — planner sections and info pages (About, Services, Pricing, FAQ, Reviews, Contact, Privacy & Terms).")
+    # OPEN navigation bar, one line, NOT a dropdown — like Facebook's
+    # top bar (reference only): every page is visible in a horizontal,
+    # scrollable bar, the current page is highlighted, and the header
+    # above and footer below stay exactly the same on every page — only
+    # the middle content changes, like YouTube's header/footer pattern.
+    section = st.radio("Navigate", SECTIONS, key="nav_section", horizontal=True,
+                       help="Open navigation — scroll left/right to see every page. Header and footer stay the same, only the page in the middle changes.")
     with st.sidebar:
         st.divider()
         st.caption("Celebration & Event Planner · Hack2Skill Challenge 5")
@@ -1554,14 +1556,20 @@ def render_pricing() -> None:
                  "No price is promised for them here, because they do not exist yet — and they will never be faked as live features.")
 
 def render_faq() -> None:
-    st.title("FAQ — frequently asked questions")
-    faqs = [("Do I need an account to use this?", "No. Everything works in your browser session, with no sign-up."),
-            ("Is my event data private?", "Yes. It stays in this browser session unless you download it. No event is published by this app."),
-            ("Do I need an AI key?", "No. Offline ideas work without a key. A Gemini key only adds extra creative ideas, and is optional."),
-            ("Does it book vendors or take payments?", "No. Those are labelled mock previews only, in Previews (Mock). Real booking and payments are the next phase."),
+    st.title("FAQ — general questions")
+    st.write("Simple, general answers about this planner — no technical jargon, no hidden charges.")
+    faqs = [("What is this website?", "A free planner for celebrations — weddings, birthdays, festivals and community events — in one place: plan, guests, budget, food, games, vendors, seating and memories."),
+            ("Who can use it?", "Anyone planning a celebration — a host, a family member, or a friend helping out. No experience needed."),
+            ("Is it free?", "Yes. It is free, with no account, no card and no trial timer."),
+            ("Do I need an account or login?", "No. Just open the live link and start. There is no sign-up, no password and no login screen."),
+            ("How do I start?", "On Home, use the 7-step wizard, or tap Try a sample birthday plan to see everything at once, then create your own plan."),
+            ("What can I plan here?", "Invitation, guest list and RSVP, budget and expenses, food and cake, music and games, kids activities, decor, vendors, seating, live event day and post-event memories."),
             ("Can I use it for a wedding?", "Yes — there is a wedding-only checklist on the Plan page, plus 18 event types including Engagement, Retirement and Family Reunion."),
-            ("How do I keep my plan?", "Go to Post-Event & Memories and download it (Markdown, calendar, CSV, JSON or PDF), or save it in this session from Home."),
-            ("Why is there no login?", "Because this phase is a free, no-account planner. Login, email verification and admin are future work, shown only as labelled mocks.")]
+            ("Is my event data private?", "Yes. It stays in this browser session unless you download it. No event is published by this app."),
+            ("How do I keep my plan?", "Save it in this session from Home, or download it from Post-Event & Memories as Markdown, calendar, CSV, JSON or PDF."),
+            ("Does it book vendors or take payments?", "No. Those are labelled mock previews only, in Previews (Mock). Real booking and payments are the next phase."),
+            ("Do I need an AI key?", "No. Offline ideas work without a key. A Gemini key only adds extra creative ideas, and is optional."),
+            ("Can I use it on my phone?", "Yes. The pages, nav bar and forms work on phone and computer — scroll the top nav bar left/right to see every page.")]
     for q, a in faqs:
         with st.expander(q):
             st.write(a)
@@ -1590,6 +1598,8 @@ def render_contact() -> None:
              "so nothing on this page is sent to a server. Use the links below, which open in your own apps.")
     st.markdown("[Open the GitHub project](https://github.com/Bhavana0212/celebration-event-planner)")
     st.markdown("[Open the live planner](https://sufuuqiqx6n4vnqrsufv6q.streamlit.app/)")
+    st.markdown("[Bhavana Shah on LinkedIn](https://www.linkedin.com/in/bhavana-shah-875a85137?utm_source=share_via&utm_content=profile&utm_medium=member_android)")
+    st.write("Connect with Bhavana Shah on LinkedIn — the link above opens her LinkedIn profile in your own app or browser.")
     st.subheader("Send a message via WhatsApp (you send it, the app sends nothing)")
     msg = st.text_area("Your message", "Hi! I tried the Celebration & Event Planner and wanted to share feedback.", max_chars=500, key="contact_msg")
     st.markdown(f"[Send this message on WhatsApp]({whatsapp_link('', msg)})")
