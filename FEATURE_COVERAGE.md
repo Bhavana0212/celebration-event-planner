@@ -348,3 +348,9 @@ evaluators, so they are listed honestly as the next phase instead.
 - Correction, do NOT retry radio + CSS hiding: nav is now st.segmented_control pills as primary (no radio circles at all), with st.radio only as a fallback for very old Streamlit without segmented_control. CSS also hides radio SVGs for the fallback case, and styles segmented-control pills magenta for the checked page.
 - This batch also includes the double-number fix (journey cards use "**{title}**" only, titles already contain numbers) and updated test_topnav / test_pages_stepper to check segmented-control nav, not radio.
 - Tests: test_design_progress_header.py updated (segmented-control primary, single-number, icon tracker, planner progress); test_progress_header.py unchanged and still passing by manual run.
+
+## 2026-10-28 — Design correction result + single-row nav fix (upload 12:05-13:23 EDT, 73 → 79 commits)
+- Uploaded all 6 files, no file stopped: app.py 8e6229e, CSS adde26c, test_design_progress_header.py bbbfd1f (new), test_topnav.py 754ce99, test_pages_stepper.py abe9afa, FEATURE_COVERAGE.md 66023c9.
+- Live check PASSED: no radio circles or small dots, header/footer same on Home and Plan, tracker icon circles (2/12 done, Planning + Invitation magenta checks, Guests gold ring next), journey cards single number only ("4. Invitation", not "4. 4. Invitation").
+- Live check PARTIAL on nav: with 22 options the pills wrapped onto 3 rows at the checked viewport, not literally one row, so the batch was NOT claimed fully live. A reboot would not fix wrapping — it is a layout/code matter, not stale deploy.
+- Fix in this batch: segmented-control CSS forced to one scrollable row — flex-wrap: nowrap !important on every inner container, radiogroup width: max-content, buttons flex-shrink: 0, outer overflow-x: auto. Test test_nav_is_one_scrollable_row_not_wrapped added.
