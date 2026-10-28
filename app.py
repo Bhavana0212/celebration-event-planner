@@ -1492,6 +1492,7 @@ def main() -> None:
         render_profile(plan)
     elif section == "Previews (Mock)":
         render_previews()
+    render_footer()
 
 
 # --- Info pages: About, Services, Pricing, FAQ, Reviews, Contact, Privacy ---
