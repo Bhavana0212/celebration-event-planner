@@ -37,3 +37,11 @@ h3 { font-size: 1.1rem; font-weight: 700; }
 .step.current .step-mark { background: #FFB800; color: #FFFFFF; }
 .step-arrow { color: #E91E8C; font-weight: 700; }
 .pro-footer { border-top: 3px solid #FFB800; padding-top: 0.75rem; margin-top: 2rem; font-size: 0.85rem; color: #6B7280; display: flex; flex-direction: column; gap: 4px; }
+/* Persistent header/footer + open one-line nav (YouTube/Facebook pattern):
+   header stays at the top and footer at the bottom of every page, only the
+   middle page content changes. Nav is NOT a dropdown: it is an open,
+   horizontal, scrollable bar in one line, current page highlighted. */
+.pro-header { position: sticky; top: 0; z-index: 100; background: #FFF5F9; padding-top: 0.5rem; }
+[data-testid="stRadio"] div[role="radiogroup"] { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 4px; padding-bottom: 6px; scrollbar-width: thin; }
+[data-testid="stRadio"] label { white-space: nowrap; flex-shrink: 0; }
+[data-testid="stRadio"] label[data-checked="true"] { background: #E91E8C; color: #FFFFFF; border-radius: 999px; }
