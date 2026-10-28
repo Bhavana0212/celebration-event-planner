@@ -126,9 +126,12 @@ def sidebar_plan_form() -> EventRequest | None:
             access = st.multiselect("Accessibility needs", ACCESSIBILITY)
             notes = st.text_area("Anything else? (optional)", max_chars=MAX_NOTES)
             submitted = st.form_submit_button("Create my plan", type="primary")
-        st.caption("Data lives in this browser session unless you download it.")
+        st.caption("Tip: the same form is also at the top of the Home page, and the section menu is now at the top of the page too — no sidebar hunting needed. Data lives in this browser session unless you download it.")
     if not submitted:
         return None
+    # Sidebar form is kept for desktop, but the same form is also on Home,
+    # so mobile users never have to hunt for the sidebar hamburger menu.
+    st.session_state["pending_section"] = "Plan"
     st.session_state["theme"] = theme
     time_text = event_time.strftime("%H:%M") if event_time else ""
     st.session_state["event_time"] = time_text
@@ -150,6 +153,45 @@ def render_home(plan: Plan | None) -> None:
     st.write("Birthdays, weddings, festivals and community events — tell us about "
              "your party, and get a complete plan — budget, guests, vendors, food, "
              "music and games — in minutes. No account needed.")
+    st.subheader("Step 1 — Create your plan here (no sidebar needed)")
+    st.caption("Fill this form and click 'Create my full plan'. Your complete plan — "
+               "invitation, budget, checklist, schedule, vendors, food, games and shopping list — "
+               "will open on the Plan page right away.")
+    with st.form("event_form_main"):
+        m_name = st.text_input("Event name", "Ava's 10th Birthday Bash", max_chars=120, key="main_event_name")
+        m_type = st.selectbox("Event type", EVENT_TYPES, key="main_event_type")
+        m_guests = st.number_input("Number of guests", 1, MAX_GUESTS, 50, step=5, key="main_guests")
+        m_budget = st.number_input("Total budget", 1000, MAX_BUDGET, 100000, step=5000, key="main_budget")
+        m_currency = st.selectbox("Currency", CURRENCIES, index=0, key="main_currency")
+        m_date = st.date_input("Event date", date.today() + timedelta(days=60),
+                               min_value=date.today(), key="main_event_date")
+        m_time = st.time_input("Event time (optional)", value=None, key="main_event_time")
+        m_city = st.text_input("City (optional)", max_chars=MAX_CITY, key="main_city")
+        m_theme = st.text_input("Theme (optional)", "Space", key="main_theme")
+        m_vibe = st.selectbox("Vibe", VIBES, key="main_vibe")
+        m_outdoor = st.checkbox("Outdoor venue", key="main_outdoor")
+        m_dietary = st.multiselect("Dietary needs", DIETARY, key="main_dietary")
+        m_access = st.multiselect("Accessibility needs", ACCESSIBILITY, key="main_access")
+        m_notes = st.text_area("Anything else? (optional)", max_chars=MAX_NOTES, key="main_notes")
+        m_submitted = st.form_submit_button("Create my full plan", type="primary")
+    if m_submitted:
+        try:
+            m_req = EventRequest(m_type, int(m_guests), float(m_budget), m_date, m_city, m_vibe,
+                                 tuple(m_dietary), tuple(m_access), m_outdoor, m_notes,
+                                 event_name=m_name, currency=m_currency,
+                                 event_time=m_time.strftime("%H:%M") if m_time else "")
+            st.session_state["theme"] = m_theme
+            st.session_state["plan"] = cached_plan(m_req.validated(date.today()), date.today())
+            st.session_state.pop("ai_text", None)
+            st.session_state["pending_section"] = "Plan"
+            st.success(f"Done! Your full plan for **{m_name}** is ready — opening it now.")
+            st.rerun()
+        except ValidationError as exc:
+            st.error(f"Please fix: {exc}")
+    if plan is not None:
+        if st.button("See my full plan →", type="primary", key="see_full_plan"):
+            st.session_state["pending_section"] = "Plan"
+            st.rerun()
     if st.button("Try a sample birthday plan", type="primary"):
         req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
                            "Toronto", "Fun & Playful", (), (), False,
@@ -158,11 +200,12 @@ def render_home(plan: Plan | None) -> None:
         st.session_state["theme"] = "Space"
         st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
         st.session_state.pop("ai_text", None)
+        st.session_state["pending_section"] = "Plan"
         st.rerun()
-    st.caption("Or create your own plan from the form on the left.")
+    st.caption("Or create your own plan from the form above — no sidebar needed.")
     st.subheader("Explore everything — tap any card, no searching in the sidebar")
     st.caption("If you have no plan yet, tapping a card opens it with a sample birthday plan, "
-               "so you can see every feature at first look. Then create your own plan from the sidebar form.")
+               "so you can see every feature at first look. Then create your own plan from the form above.")
     quick = {
         "Plan": "Budget split, checklist, risks, logistics and menu.",
         "Guests & Invites": "Guest list, RSVP, invitations, WhatsApp, email and QR.",
@@ -192,14 +235,14 @@ def render_home(plan: Plan | None) -> None:
                                        event_name="Ava's 10th Birthday Bash", currency="CAD")
                     st.session_state["theme"] = "Space"
                     st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
-                # Do NOT set nav_section here: the sidebar radio with that
+                # Do NOT set nav_section here: the top radio with that
                 # key is already instantiated by the time Home renders.
                 # main() picks pending_section up before creating the radio.
                 st.session_state["pending_section"] = section
                 st.rerun()
     if plan is not None:
         st.success(f"Current event: **{plan.request.event_name or plan.request.event_type}** — "
-                   f"{plan.days_left} days to go. Use the sections on the left to manage it.")
+                   f"{plan.days_left} days to go. Use the section menu at the top of the page to manage it.")
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Event types", str(len(EVENT_TYPES)))
@@ -358,6 +401,25 @@ def render_plan(plan: Plan) -> None:
     for course, dishes in plan.menu.items():
         st.markdown(f"**{course}:** " + "; ".join(dishes))
     st.caption("Always confirm allergens with your caterer.")
+    st.subheader("Full plan at a glance — invitation, schedule, vendors, shopping, games, music")
+    st.caption("Everything from your details, on one page — so you do not have to open every section to see the plan.")
+    st.markdown("**Invitation (ready to copy)**")
+    st.text_area("Your invitation", invitation_text(plan.request, st.session_state.get("theme", "")), height=150, key="fullplan_invite")
+    st.markdown("**Day schedule**")
+    for title, detail in day_schedule(plan.request.event_type):
+        st.write(f"- **{title}:** {detail}")
+    st.markdown("**Vendors to book**")
+    for vendor in vendor_checklist(plan.request.event_type):
+        st.write(f"- {vendor}")
+    st.markdown("**Shopping / item list (scaled by guests)**")
+    for item in item_list(plan.request.guests):
+        st.write(f"- {item}")
+    st.markdown("**Games for this event**")
+    for name, duration, detail in games_for(plan.request.event_type):
+        st.write(f"- **{name}** ({duration}) — {detail}")
+    st.markdown("**Music by moment**")
+    for moment, note in music_by_moment():
+        st.write(f"- **{moment}:** {note}")
     st.subheader("Notes & reminders")
     st.text_area("Your notes for this event", key="plan_notes", height=120,
                  help="Stored only in this browser session.")
@@ -1139,8 +1201,12 @@ def main() -> None:
     # the radio widget is created, otherwise Streamlit rejects the change.
     if st.session_state.get("pending_section"):
         st.session_state["nav_section"] = st.session_state.pop("pending_section")
+    # TOP navigation bar: a horizontal menu at the top of the page, so a
+    # person can pick any section as they like — no sidebar hamburger hunt,
+    # especially on mobile. The sidebar still holds the (optional) plan form.
+    st.caption("Choose a section below — tap any name, it opens at once.")
+    section = st.radio("Choose a section", SECTIONS, horizontal=True, key="nav_section")
     with st.sidebar:
-        section = st.radio("Navigate", SECTIONS, key="nav_section")
         st.divider()
         st.caption("Celebration & Event Planner · Hack2Skill Challenge 5")
     if section == "Home":
