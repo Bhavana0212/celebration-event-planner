@@ -316,3 +316,10 @@ evaluators, so they are listed honestly as the next phase instead.
 - Metrics no longer truncated on mobile: Plan, dashboard, readiness, Home stats and logistics now use 2-3 columns instead of 4-5 across.
 - Page-wise, not one long page: Home's 14 quick cards removed (top menu + journey already navigate); Why/How/What/templates/FAQ/saved-events moved into one collapsed "More about this planner" expander, so Home on first look is hero + wizard/dashboard + journey + explore only. Plan split into 4 tabs: Overview / Budget & Checklist / Invitation & Day Plan / My tasks & Notes.
 - 190 tests pass (new test_celebration_vibe.py; older Forest palette tests updated, readiness test updated to dashboard heading).
+
+## 2026-10-28 — Pages + stepper + navbar batch (user feedback: no more one long page)
+- Top navbar is now one dropdown "Navigate to a page" (22 pages) instead of 20 wrapping radio buttons; header bar on top, footer bar on every page (brand, page list, free/no-account note).
+- New info pages (work without a plan): About, Services (12 services, each opens its page), Pricing (Free plan; future ideas labelled NOT available, no price promised), FAQ, Reviews (honest: no verified reviews yet; session-only reviews, not published), Contact (GitHub + live links, WhatsApp draft link — app sends nothing), Privacy & Terms (session-only data, no account, no tracking).
+- Journey is now a horizontal process graph (Step 1 → Step 2 → …): ✓ done, ▶ next step, numbered coming up — plus 3-column step cards with Open buttons. No "Pending" table, no "Create plan first" column.
+- Form first on Home: wizard/dashboard now sit right after the hero and example button, journey comes after — nobody scrolls to the bottom to fill a form. Content lives between header and footer.
+- 195 tests pass (new test_pages_stepper.py; topnav test updated to the selectbox navbar).
