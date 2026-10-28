@@ -52,7 +52,13 @@ h3 { font-size: 1.1rem; font-weight: 700; }
 [data-testid="stRadio"] label { white-space: nowrap; flex-shrink: 0; padding: 8px 14px !important; border-radius: 999px !important; font-weight: 600; color: #374151; }
 [data-testid="stRadio"] label:hover { background: #FFE4F1; color: #E91E8C; }
 [data-testid="stRadio"] input[type="radio"] { display: none; }
+[data-testid="stRadio"] svg { display: none !important; }
 [data-testid="stRadio"] label[data-checked="true"], [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) { background: #E91E8C !important; color: #FFFFFF !important; }
+/* Segmented control nav (primary): clean pill buttons, no circles at all. */
+[data-testid="stSegmentedControl"] { background: #FFFFFF; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 6px 8px; margin-bottom: 1rem; }
+[data-testid="stSegmentedControl"] div[role="radiogroup"] { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; }
+[data-testid="stSegmentedControl"] button { white-space: nowrap; border-radius: 999px !important; font-weight: 600; }
+[data-testid="stSegmentedControl"] button[aria-checked="true"] { background: #E91E8C !important; color: #FFFFFF !important; }
 /* Wizard / journey progress bar in planner colours, not default blue. */
 [data-testid="stProgress"] > div > div { background: linear-gradient(90deg, #E91E8C, #FFB800) !important; }
 
