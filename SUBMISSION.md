@@ -25,7 +25,7 @@ Merged two builds into one market-ready Streamlit Celebration & Event Planner fo
 
 ## 5. Mention the Gen AI services utilized, and where (copy-paste)
 
-GenAI was used in two places. (1) Development: Muse (Meta AI) assisted in merging, designing and testing this app. (2) In-app: Google Gemini (gemini-2.5-flash, via google-genai) in planner/ai.py writes creative ideas in the Ideas tab when GEMINI_API_KEY is set in Streamlit Secrets; it sends only validated plan context, with user notes fenced as untrusted data, capped at 5 calls per session. Without a key, offline ideas are used and the app works fully. No GCP credits were used and no key is hard-coded.
+GenAI actually used, at zero cost, no paid plan. (1) In-app, optional: Google Gemini gemini-2.5-flash via google-genai in planner/ai.py, on the AI Assistant page, for creative ideas only, capped at 5 calls per session, sending only validated plan context with user notes fenced as untrusted. Without a key the app works fully on offline rule-based ideas, so no paid AI call is required and no key is hard-coded. Core planning itself is rule-based and testable, not AI-invented. (2) Showcase videos only: AI text-to-speech voice Aria for the tour video voiceover. No other GenAI tool is claimed: no ChatGPT, OpenAI, Claude or paid image tool was used.
 
 ## 6. LinkedIn Post — post this text first, then paste the post link
 
