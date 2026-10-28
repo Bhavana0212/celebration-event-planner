@@ -275,3 +275,37 @@ evaluators, so they are listed honestly as the next phase instead.
 - NOT yet uploaded at commit time: the professional-theme GitHub upload
   was still running, so this batch uploads after it to avoid
   conflicting web edits.
+
+## Premium polish + wizard batch (2026-10-28, user chose Streamlit premium polish, submission safe)
+- Palette switched to the reference premium palette: Forest #24352E
+  (primary/buttons/headings), Champagne #C6A477 (accent line),
+  Ivory #F7F3ED (panels/sidebar), White, Charcoal #30343B (text),
+  with editorial serif (Georgia) headings and clean sans body,
+  14-16px card radius, 44px minimum touch targets on buttons.
+- Sidebar duplicate form REMOVED: the old design had the same long
+  form in the sidebar and on Home, which dominated mobile screens.
+  Sidebar is now only a short workspace guide (current event + days
+  to go, if a plan exists). Event creation lives only on Home.
+- 7-step event creation wizard (reference design): 1 Occasion,
+  2 Date & location, 3 Guests, 4 Style, 5 Budget, 6 Services,
+  7 Review — with "Step X of 7" progress, Back/Continue, auto-save
+  into wizard_data on every step (going Back never loses answers),
+  and only the final "Create my full plan" button builds the plan
+  and lands on Plan with "Full plan at a glance".
+- Customer dashboard when a plan exists (reference design): Home
+  shows "Your dashboard" with upcoming celebration + days to go,
+  planning progress (journey steps done), budget planned / spent /
+  remaining, guests attending, next action, and quick actions
+  (See my full plan, Add a guest, Add an expense). The wizard then
+  sits inside "Create a different event" instead of replacing the
+  dashboard. With no plan, Home shows "Explore all celebrations"
+  (Wedding / Birthday / Corporate Party / Baby Shower) that start
+  the wizard with that occasion pre-chosen.
+- Honest limit, unchanged: this is still Streamlit underneath —
+  polished, grouped and wizard-guided, but not a CELESTIA-level
+  custom site. That rebuild stays a post-submission phase.
+- Tests: 187 pass (185 + 2 new premium-polish tests); old sidebar
+  and main-form tests updated to the wizard flow (sidebar has no
+  button, wizard walk creates a plan and lands on Plan).
+- NOT yet uploaded at commit time: upload this batch now (it is the
+  current batch), then live-verify.

@@ -117,42 +117,24 @@ def plan_or_none() -> Plan | None:
 
 
 def sidebar_plan_form() -> EventRequest | None:
-    with st.sidebar:
-        st.header("Start planning")
-        st.caption("Step 1 — Tell us about your event. Step 2 — Get your full plan.")
-        with st.form("event_form"):
-            event_name = st.text_input("Event name", "Ava's 10th Birthday Bash", max_chars=120)
-            event_type = st.selectbox("Event type", EVENT_TYPES)
-            guests = st.number_input("Number of guests", 1, MAX_GUESTS, 50, step=5)
-            budget = st.number_input("Total budget", 1000, MAX_BUDGET, 100000, step=5000)
-            currency = st.selectbox("Currency", CURRENCIES, index=0)
-            event_date = st.date_input("Event date", date.today() + timedelta(days=60),
-                                       min_value=date.today())
-            end_date = st.date_input("End date (optional, for multi-day events)", value=None,
-                                     min_value=date.today())
-            event_time = st.time_input("Event time (optional)", value=None)
-            city = st.text_input("City (optional)", max_chars=MAX_CITY)
-            theme = st.text_input("Theme (optional)", "Space")
-            vibe = st.selectbox("Vibe", VIBES)
-            outdoor = st.checkbox("Outdoor venue")
-            dietary = st.multiselect("Dietary needs", DIETARY)
-            access = st.multiselect("Accessibility needs", ACCESSIBILITY)
-            notes = st.text_area("Anything else? (optional)", max_chars=MAX_NOTES)
-            submitted = st.form_submit_button("Create my plan", type="primary")
-        st.caption("Tip: the same form is also at the top of the Home page, and the section menu is now at the top of the page too — no sidebar hunting needed. Data lives in this browser session unless you download it.")
-    if not submitted:
-        return None
-    # Sidebar form is kept for desktop, but the same form is also on Home,
-    # so mobile users never have to hunt for the sidebar hamburger menu.
-    st.session_state["pending_section"] = "Plan"
-    st.session_state["theme"] = theme
-    time_text = event_time.strftime("%H:%M") if event_time else ""
-    st.session_state["event_time"] = time_text
-    return EventRequest(event_type, int(guests), float(budget), event_date, city, vibe,
-                        tuple(dietary), tuple(access), outdoor, notes,
-                        event_name=event_name, currency=currency, event_time=time_text,
-                        end_date=end_date)
+    """Sidebar no longer holds a duplicate event form (premium polish).
 
+    The old design had the same long form in the sidebar AND on Home,
+    which is exactly what made the layout look cluttered and basic on
+    mobile. Now the sidebar is only a short workspace guide; event
+    creation lives in the 7-step wizard on Home (render_event_wizard).
+    This function returns None so main() never creates a plan from here.
+    """
+    with st.sidebar:
+        st.header("Your workspace")
+        st.caption("Start on Home: the 7-step wizard there creates your plan. "
+                   "Use the section menu at the top to manage it — no sidebar form to hunt for.")
+        plan = st.session_state.get("plan")
+        if plan is not None:
+            st.caption(f"Current event: {plan.request.event_name or plan.request.event_type} — "
+                       f"{plan.days_left} days to go.")
+        st.caption("Data lives in this browser session unless you download it.")
+    return None
 
 
 # --- Step-by-step journey: start to end, in order -------------------------
@@ -224,6 +206,128 @@ def render_journey() -> None:
                "Steps 1 and 4 are ready with your plan itself, because the plan generates the checklist and the invitation.")
 
 
+
+# --- Premium polish: 7-step event creation wizard + dashboard -------------
+WIZARD_STEPS = ["Occasion", "Date & location", "Guests", "Style", "Budget", "Services", "Review"]
+
+def wizard_defaults() -> dict:
+    return {"name": "Ava's 10th Birthday Bash", "type": "Birthday",
+            "date": date.today() + timedelta(days=60), "end_date": None, "time": None,
+            "city": "", "outdoor": False, "guests": 50, "dietary": [], "access": [],
+            "theme": "Space", "vibe": "Casual", "budget": 100000.0, "currency": CURRENCIES[0],
+            "needs": [], "notes": ""}
+
+def wizard_data() -> dict:
+    return st.session_state.setdefault("wizard_data", wizard_defaults())
+
+def wizard_step() -> int:
+    return st.session_state.get("wizard_step", 1)
+
+def render_event_wizard() -> None:
+    """7-step wizard (reference design: short steps, progress, auto-save).
+
+    Data is saved into wizard_data on every Back/Continue, so going back
+    never loses an answer. Only the final step creates a plan.
+    """
+    data = wizard_data()
+    step = wizard_step()
+    st.subheader("Create your event — step by step")
+    st.progress(step / len(WIZARD_STEPS), text=f"Step {step} of {len(WIZARD_STEPS)} — {WIZARD_STEPS[step - 1]}")
+    st.caption("Short steps, one question group at a time. Back never loses your answers — they are saved as you go.")
+    if step == 1:
+        data["type"] = st.selectbox("What are we celebrating?", EVENT_TYPES,
+                                    index=EVENT_TYPES.index(data["type"]) if data["type"] in EVENT_TYPES else 0, key="wiz_type")
+        data["name"] = st.text_input("Event name", data["name"], max_chars=120, key="wiz_name")
+    elif step == 2:
+        data["date"] = st.date_input("Event date", data["date"], min_value=date.today(), key="wiz_date")
+        data["end_date"] = st.date_input("End date (optional, for multi-day events)", value=data["end_date"],
+                                         min_value=date.today(), key="wiz_end")
+        data["time"] = st.time_input("Event time (optional)", value=data["time"], key="wiz_time")
+        data["city"] = st.text_input("City (optional)", data["city"], max_chars=MAX_CITY, key="wiz_city")
+        data["outdoor"] = st.checkbox("Outdoor venue", data["outdoor"], key="wiz_outdoor")
+    elif step == 3:
+        data["guests"] = st.number_input("How many guests?", 1, MAX_GUESTS, int(data["guests"]), step=5, key="wiz_guests")
+        data["dietary"] = st.multiselect("Dietary needs", DIETARY, default=data["dietary"], key="wiz_dietary")
+        data["access"] = st.multiselect("Accessibility needs", ACCESSIBILITY, default=data["access"], key="wiz_access")
+    elif step == 4:
+        data["theme"] = st.text_input("Theme", data["theme"], key="wiz_theme")
+        data["vibe"] = st.selectbox("Vibe", VIBES, index=VIBES.index(data["vibe"]) if data["vibe"] in VIBES else 0, key="wiz_vibe")
+    elif step == 5:
+        data["budget"] = st.number_input("Total budget", 1000.0, float(MAX_BUDGET), float(data["budget"]), step=5000.0, key="wiz_budget")
+        data["currency"] = st.selectbox("Currency", CURRENCIES,
+                                        index=CURRENCIES.index(data["currency"]) if data["currency"] in CURRENCIES else 0, key="wiz_currency")
+    elif step == 6:
+        data["needs"] = st.multiselect("What do you need help with?",
+                                       ["Venue", "Food & catering", "Decor", "Photography", "Music & entertainment",
+                                        "Shopping", "Kids activities", "Transport"], default=data["needs"], key="wiz_needs")
+        data["notes"] = st.text_area("Anything else? (optional)", data["notes"], max_chars=MAX_NOTES, key="wiz_notes")
+    else:
+        st.write(f"**Occasion:** {data['type']} — {data['name']}")
+        st.write(f"**When & where:** {data['date'].isoformat()}" + (f" to {data['end_date'].isoformat()}" if data["end_date"] else "")
+                 + (f" at {data['time'].strftime('%H:%M')}" if data["time"] else "") + (f", {data['city']}" if data["city"] else "")
+                 + (" (outdoor)" if data["outdoor"] else ""))
+        st.write(f"**Guests:** {data['guests']}" + (f", dietary: {', '.join(data['dietary'])}" if data["dietary"] else "")
+                 + (f", accessibility: {', '.join(data['access'])}" if data["access"] else ""))
+        st.write(f"**Style:** {data['theme']} theme, {data['vibe']} vibe")
+        st.write(f"**Budget:** {money(float(data['budget']), data['currency'])}")
+        st.write(f"**Needs:** {', '.join(data['needs']) if data['needs'] else 'Full plan (everything)'}")
+        if data["notes"]:
+            st.write(f"**Notes:** {data['notes']}")
+        st.caption("Review everything above. If something is wrong, go Back and fix it — nothing is lost.")
+    c_back, c_next = st.columns(2)
+    if step > 1 and c_back.button("← Back", key="wiz_back"):
+        st.session_state["wizard_step"] = step - 1
+        st.rerun()
+    if step < len(WIZARD_STEPS):
+        if c_next.button("Continue →", type="primary", key="wiz_next"):
+            st.session_state["wizard_step"] = step + 1
+            st.rerun()
+    elif c_next.button("Create my full plan", type="primary", key="wiz_create"):
+        try:
+            notes = data["notes"] + (f"\nNeeds: {', '.join(data['needs'])}" if data["needs"] else "")
+            req = EventRequest(data["type"], int(data["guests"]), float(data["budget"]), data["date"], data["city"],
+                               data["vibe"], tuple(data["dietary"]), tuple(data["access"]), bool(data["outdoor"]), notes,
+                               event_name=data["name"], currency=data["currency"],
+                               event_time=data["time"].strftime("%H:%M") if data["time"] else "",
+                               end_date=data["end_date"])
+            st.session_state["theme"] = data["theme"]
+            st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
+            st.session_state.pop("ai_text", None)
+            st.session_state["wizard_step"] = 1
+            st.session_state["pending_section"] = "Plan"
+            st.success(f"Done! Your full plan for **{data['name']}** is ready — opening it now.")
+            st.rerun()
+        except ValidationError as exc:
+            st.error(f"Please fix: {exc}")
+
+def render_dashboard(plan) -> None:
+    """Customer dashboard (reference design): upcoming event, progress, budget, next actions."""
+    st.subheader("Your dashboard — your celebration, all in one place")
+    flags = journey_done_flags()
+    done = sum(flags)
+    expenses = store("expenses", [])
+    spent = sum(float(x.get("Amount", 0) or 0) for x in expenses)
+    guests = store("real_guests", [])
+    attending = sum(1 for g in guests if g.get("RSVP") == "Attending")
+    with st.container(border=True):
+        st.write(f"**Upcoming celebration: {plan.request.event_name or plan.request.event_type}**")
+        st.write(f"{plan.days_left} days to go · {plan.request.event_date.isoformat()} · {plan.request.guests} guests expected")
+        st.progress(done / len(JOURNEY_STEPS), text=f"Planning progress: {done} of {len(JOURNEY_STEPS)} steps done")
+        d1, d2, d3, d4 = st.columns(4)
+        d1.metric("Budget planned", money(plan.request.budget, plan.request.currency))
+        d2.metric("Spent so far", money(spent, plan.request.currency))
+        d3.metric("Remaining", money(plan.request.budget - spent, plan.request.currency))
+        d4.metric("Guests attending", f"{attending} / {len(guests) if guests else plan.request.guests}")
+        nxt = next((JOURNEY_STEPS[i][0] for i, f in enumerate(flags) if not f), None)
+        st.write(f"**Next action:** {nxt if nxt else 'All steps done — enjoy your celebration!'}")
+        q1, q2, q3 = st.columns(3)
+        if q1.button("See my full plan →", key="dash_plan"):
+            st.session_state["pending_section"] = "Plan"; st.rerun()
+        if q2.button("Add a guest", key="dash_guests"):
+            st.session_state["pending_section"] = "Guests & Invites"; st.rerun()
+        if q3.button("Add an expense", key="dash_budget"):
+            st.session_state["pending_section"] = "Budget & Expenses"; st.rerun()
+
 def render_home(plan: Plan | None) -> None:
     # Professional landing: one clear headline, one clear action, then
     # services as clean cards — the pattern used by professional event
@@ -237,8 +341,8 @@ def render_home(plan: Plan | None) -> None:
              "your party, and get a complete plan — budget, guests, vendors, food, "
              "music and games — in minutes. No account needed.")
     st.info("🆕 **First time here? Start here — 3 steps, about 2 minutes:**\n"
-            "**1.** Tap the example below (1 tap, no form) OR fill the short form below it.\n"
-            "**2.** Click 'Create my full plan' — your full plan opens by itself on the Plan page.\n"
+            "**1.** Tap the example below (1 tap, no form) OR follow the 7-step wizard below it.\n"
+            "**2.** At the last wizard step, click 'Create my full plan' — your full plan opens by itself on the Plan page.\n"
             "**3.** Use the menu at the top to add guests, track budget, and share invitations. No login, no payment, nothing to install.")
     if st.button("👀 See an example first — 1 tap, no form needed", type="primary", key="hero_sample"):
         req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
@@ -251,42 +355,18 @@ def render_home(plan: Plan | None) -> None:
         st.session_state["pending_section"] = "Plan"
         st.rerun()
     render_journey()
-    st.subheader("Step 1 — Create your plan here (no sidebar needed)")
-    st.caption("Only 5 things are needed: event name, type, guests, budget, date. Everything else below is optional — skip it if you want.")
-    st.caption("Fill this form and click 'Create my full plan'. Your complete plan — "
-               "invitation, budget, checklist, schedule, vendors, food, games and shopping list — "
-               "will open on the Plan page right away.")
-    with st.form("event_form_main"):
-        m_name = st.text_input("Event name", "Ava's 10th Birthday Bash", max_chars=120, key="main_event_name")
-        m_type = st.selectbox("Event type", EVENT_TYPES, key="main_event_type")
-        m_guests = st.number_input("Number of guests", 1, MAX_GUESTS, 50, step=5, key="main_guests")
-        m_budget = st.number_input("Total budget", 1000, MAX_BUDGET, 100000, step=5000, key="main_budget")
-        m_currency = st.selectbox("Currency", CURRENCIES, index=0, key="main_currency")
-        m_date = st.date_input("Event date", date.today() + timedelta(days=60),
-                               min_value=date.today(), key="main_event_date")
-        m_time = st.time_input("Event time (optional)", value=None, key="main_event_time")
-        m_city = st.text_input("City (optional)", max_chars=MAX_CITY, key="main_city")
-        m_theme = st.text_input("Theme (optional)", "Space", key="main_theme")
-        m_vibe = st.selectbox("Vibe", VIBES, key="main_vibe")
-        m_outdoor = st.checkbox("Outdoor venue", key="main_outdoor")
-        m_dietary = st.multiselect("Dietary needs", DIETARY, key="main_dietary")
-        m_access = st.multiselect("Accessibility needs", ACCESSIBILITY, key="main_access")
-        m_notes = st.text_area("Anything else? (optional)", max_chars=MAX_NOTES, key="main_notes")
-        m_submitted = st.form_submit_button("Create my full plan", type="primary")
-    if m_submitted:
-        try:
-            m_req = EventRequest(m_type, int(m_guests), float(m_budget), m_date, m_city, m_vibe,
-                                 tuple(m_dietary), tuple(m_access), m_outdoor, m_notes,
-                                 event_name=m_name, currency=m_currency,
-                                 event_time=m_time.strftime("%H:%M") if m_time else "")
-            st.session_state["theme"] = m_theme
-            st.session_state["plan"] = cached_plan(m_req.validated(date.today()), date.today())
-            st.session_state.pop("ai_text", None)
-            st.session_state["pending_section"] = "Plan"
-            st.success(f"Done! Your full plan for **{m_name}** is ready — opening it now.")
-            st.rerun()
-        except ValidationError as exc:
-            st.error(f"Please fix: {exc}")
+    if plan is not None:
+        render_dashboard(plan)
+        with st.expander("Create a different event — 7-step wizard"):
+            render_event_wizard()
+    else:
+        st.subheader("Explore all celebrations")
+        st.caption("Tap a celebration to start the wizard with that occasion already chosen — or use the wizard below with your own occasion.")
+        e1, e2, e3, e4 = st.columns(4)
+        for col, occasion in zip((e1, e2, e3, e4), ["Wedding", "Birthday", "Corporate Party", "Baby Shower"]):
+            if col.button(occasion, key=f"explore_{occasion}"):
+                d = wizard_data(); d["type"] = occasion; st.session_state["wizard_step"] = 1; st.rerun()
+        render_event_wizard()
     if plan is not None:
         if st.button("See my full plan →", type="primary", key="see_full_plan"):
             st.session_state["pending_section"] = "Plan"
@@ -322,10 +402,10 @@ def render_home(plan: Plan | None) -> None:
         st.session_state.pop("ai_text", None)
         st.session_state["pending_section"] = "Plan"
         st.rerun()
-    st.caption("Or create your own plan from the form above — no sidebar needed.")
+    st.caption("Or create your own plan with the 7-step wizard above — no sidebar form anymore.")
     st.subheader("Explore everything — tap any card, no searching in the sidebar")
     st.caption("If you have no plan yet, tapping a card opens it with a sample birthday plan, "
-               "so you can see every feature at first look. Then create your own plan from the form above.")
+               "so you can see every feature at first look. Then create your own plan with the wizard above.")
     quick = {
         "Plan": "Budget split, checklist, risks, logistics and menu.",
         "Guests & Invites": "Guest list, RSVP, invitations, WhatsApp, email and QR.",
