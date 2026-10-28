@@ -309,3 +309,10 @@ evaluators, so they are listed honestly as the next phase instead.
   button, wizard walk creates a plan and lands on Plan).
 - NOT yet uploaded at commit time: upload this batch now (it is the
   current batch), then live-verify.
+
+## 2026-10-28 — Celebration-vibe + page-wise batch (user feedback on live screenshots)
+- Theme back to festive: magenta #C026D3 / warm ivory #FFF7ED / gold #F59E0B / pink #FDF2F8. Forest/Champagne was too serious, no celebration feeling.
+- Header no longer clipped: pro-header wraps (flex-wrap), brand wraps, block-container top padding 2.5rem (3rem on mobile).
+- Metrics no longer truncated on mobile: Plan, dashboard, readiness, Home stats and logistics now use 2-3 columns instead of 4-5 across.
+- Page-wise, not one long page: Home's 14 quick cards removed (top menu + journey already navigate); Why/How/What/templates/FAQ/saved-events moved into one collapsed "More about this planner" expander, so Home on first look is hero + wizard/dashboard + journey + explore only. Plan split into 4 tabs: Overview / Budget & Checklist / Invitation & Day Plan / My tasks & Notes.
+- 190 tests pass (new test_celebration_vibe.py; older Forest palette tests updated, readiness test updated to dashboard heading).
