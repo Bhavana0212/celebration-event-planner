@@ -72,7 +72,8 @@ BUDGET_CATEGORIES = ["Venue", "Catering", "Cake", "Decor", "Music", "Entertainme
 SECTIONS = ["Home", "Plan", "Guests & Invites", "Budget & Expenses",
             "Food & Cake", "Music & Games", "Kids", "Decor & Design",
             "Vendors & Shopping", "Seating & Floor Plan", "Live Event Day",
-            "Post-Event & Memories", "AI Assistant", "Profile & Settings"]
+            "Post-Event & Memories", "AI Assistant", "Profile & Settings",
+            "Previews (Mock)"]
 
 
 @st.cache_data(show_spinner=False, max_entries=64)
@@ -176,6 +177,7 @@ def render_home(plan: Plan | None) -> None:
         "Post-Event & Memories": "Photos, collage, guestbook, gifts, final report.",
         "AI Assistant": "Ask about your event, get ideas and budget tips.",
         "Profile & Settings": "Your local profile, backup/restore, pricing preview.",
+        "Previews (Mock)": "Mock views of login, checkout, booking, 3D plan and admin — preview only, nothing real happens here.",
     }
     cols = st.columns(2)
     for i, (section, desc) in enumerate(quick.items()):
@@ -1049,6 +1051,80 @@ def render_profile(plan: Plan | None) -> None:
         st.write("Content moderation in v3: you can delete your own guests, vendors and expenses from their sections. "
                  "A multi-user admin panel needs a backend and is a next phase.")
 
+def render_previews() -> None:
+    """Mock previews of future features — clearly labelled, no real actions.
+
+    Safety rules for every preview below:
+    - No password or card-number input field exists anywhere here.
+    - Every action button is disabled, or only shows a "preview only" message.
+    - Nothing is created, booked, charged, sent or saved to a server.
+    - Sample names, prices and stats are illustrative only.
+    """
+    st.subheader("Previews (Mock) — how future features will look")
+    st.warning("⚠️ MOCK PREVIEW ONLY — Nothing on this page creates an account, "
+               "takes a payment, books a vendor, sends a message, or saves data "
+               "to a server. These are views to show the design until the free "
+               "backend (Supabase) version is built. Real features will replace "
+               "each preview, one by one.")
+    st.caption("Works without a plan — open this section from Home any time.")
+
+    with st.expander("1. Login / Account — MOCK PREVIEW", expanded=True):
+        st.write("**Mock sign-in screen (design only)**")
+        st.write("Email: sample@example.com  •  Password: ••••••••  (not a real form — no password field here)")
+        st.button("Sign in with Google (mock — disabled)", disabled=True)
+        st.button("Sign in (mock — disabled)", disabled=True)
+        st.write("After real login, this page will show: your events on any device, "
+                 "profile photo, and saved payment methods via a secure provider — none of that exists yet.")
+        st.caption("Preview only: no account is created and no password is collected or sent anywhere.")
+
+    with st.expander("2. Checkout & Payments — MOCK PREVIEW"):
+        st.write("**Mock order summary (sample prices, not a real cart)**")
+        st.table([{"Item": "Balloon Arch Kit (sample)", "Qty": "1", "Price": "₹2,500 (sample)"},
+                  {"Item": "Photo Booth Props (sample)", "Qty": "1", "Price": "₹1,500 (sample)"},
+                  {"Item": "Total (sample)", "Qty": "—", "Price": "₹4,000 (sample)"}])
+        st.button("Pay now (mock — disabled, no payment taken)", disabled=True)
+        st.caption("Preview only: no card details are collected here, no payment gateway is connected, "
+                   "and no money moves. Real checkout needs a payment provider and will always charge its own transaction fee.")
+
+    with st.expander("3. Vendor Booking — MOCK PREVIEW"):
+        st.write("**Mock booking request (sample vendor, sample status)**")
+        st.table([{"Vendor": "Dream Venue Hall (sample)", "Date": "Sample date", "Status": "Request sent (mock sample)"},
+                  {"Vendor": "Tasty Bites Catering (sample)", "Date": "Sample date", "Status": "Awaiting reply (mock sample)"}])
+        st.button("Request booking (mock — disabled)", disabled=True)
+        st.caption("Preview only: no vendor is contacted and no booking is made. Real bookings will be database records in the backend version.")
+
+    with st.expander("4. 3D Floor Plan — MOCK PREVIEW"):
+        st.write("**Mock 3D-style view (illustration, not interactive 3D)**")
+        st.write("Imagine this room from above, tilted: Stage at the back, 6 round tables in the middle, "
+                 "dance floor in front, entrance on the right, photo booth in the corner.")
+        cols = st.columns(3)
+        for i, label in enumerate(["🎤 Stage", "🪑 Table 1", "🪑 Table 2", "💃 Dance floor", "🪑 Table 3", "📸 Photo booth"]):
+            with cols[i % 3]:
+                st.markdown(f"**{label}**")
+        st.caption("Preview only: this is a labelled layout, not a drag-and-drop 3D editor. Real 3D/AR is a premium next phase.")
+
+    with st.expander("5. Live Multi-user Collaboration — MOCK PREVIEW"):
+        st.write("**Mock collaborators (sample people, not live users)**")
+        st.table([{"Name": "Sample co-host", "Role": "Co-host (sample)", "Status": "Online (mock sample)"},
+                  {"Name": "Sample family member", "Role": "Helper (sample)", "Status": "Editing checklist (mock sample)"}])
+        st.write("Sample comment: \"I booked the cake shop\" — sample co-host (mock sample)")
+        st.caption("Preview only: no other user is actually online. Real live sync needs a backend database.")
+
+    with st.expander("6. Email / SMS Notifications — MOCK PREVIEW"):
+        st.write("**Mock notifications (samples, nothing is sent)**")
+        st.write("- 📧 Sample: \"Reminder: venue payment due in 3 days\" (mock sample, not sent)")
+        st.write("- 📱 Sample: \"RSVP from 5 guests still pending\" (mock sample, not sent)")
+        st.caption("Preview only: this app sends no email or SMS today. Real notifications need a backend + messaging provider.")
+
+    with st.expander("7. Admin Dashboard — MOCK PREVIEW"):
+        st.write("**Mock business stats (sample numbers)**")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Sample events planned", "1,240 (sample)")
+        c2.metric("Sample vendors listed", "86 (sample)")
+        c3.metric("Sample orders", "312 (sample)")
+        st.caption("Preview only: these are sample numbers, not real analytics. A real admin panel needs a backend.")
+
+
 
 def main() -> None:
     request = sidebar_plan_form()
@@ -1069,6 +1145,8 @@ def main() -> None:
         st.caption("Celebration & Event Planner · Hack2Skill Challenge 5")
     if section == "Home":
         render_home(plan)
+    elif section == "Previews (Mock)":
+        render_previews()
     elif plan is None:
         render_home(None)
         st.warning("Create a plan from the sidebar form (or try a sample plan on Home) to use this section.")
@@ -1098,6 +1176,8 @@ def main() -> None:
         render_ai(plan)
     elif section == "Profile & Settings":
         render_profile(plan)
+    elif section == "Previews (Mock)":
+        render_previews()
 
 
 main()
