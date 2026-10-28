@@ -5,9 +5,9 @@ TEXT = (ROOT / "app.py").read_text()
 CSS = (ROOT / "assets" / "professional-theme.css").read_text()
 
 def test_top_navbar_is_open_radio_and_footer_exists():
-    # Open one-line nav, not a dropdown: horizontal radio, header/footer on every page.
-    assert 'st.radio("Navigate"' in TEXT
-    assert "horizontal=True" in TEXT
+    # Open one-line nav, not a dropdown: segmented-control pills primary,
+    # radio only as fallback, header/footer on every page.
+    assert 'st.segmented_control("Navigate"' in TEXT
     assert 'st.selectbox("Navigate to a page"' not in TEXT
     assert "def render_footer" in TEXT
     assert "pro-footer" in CSS
