@@ -7,8 +7,8 @@ CFG = (ROOT / ".streamlit" / "config.toml").read_text()
 
 def test_forest_champagne_ivory_palette():
     # Superseded by celebration vibe: Forest was too serious, no party feeling.
-    assert "#C026D3" in CFG and "#FFF7ED" in CFG
-    assert "#F59E0B" in CSS  # gold accent
+    assert "#E91E8C" in CFG and "#FFF5F9" in CFG
+    assert "#FFB800" in CSS  # gold accent
     assert "Georgia" in CSS  # editorial serif headings
 
 def test_wizard_and_dashboard_present():
