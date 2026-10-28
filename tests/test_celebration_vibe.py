@@ -6,9 +6,9 @@ CSS = (ROOT / "assets" / "professional-theme.css").read_text()
 CFG = (ROOT / ".streamlit" / "config.toml").read_text()
 
 def test_celebration_palette_not_forest():
-    assert "#C026D3" in CFG  # festive magenta, not serious Forest
-    assert "#FFF7ED" in CFG  # warm ivory background
-    assert "#F59E0B" in CSS  # gold accent
+    assert "#E91E8C" in CFG  # vivid popping pink, not serious Forest
+    assert "#FFF5F9" in CFG  # bright pink-tinted background
+    assert "#FFB800" in CSS  # gold accent
     assert "#24352E" not in CFG
 
 def test_header_wraps_and_metrics_not_truncated():
