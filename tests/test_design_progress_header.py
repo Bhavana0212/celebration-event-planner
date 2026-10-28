@@ -12,6 +12,12 @@ def test_nav_is_segmented_control_pills_no_radio_circles():
     # Radio is only a fallback for very old Streamlit, never the primary nav.
     assert TEXT.index('st.segmented_control("Navigate"') < TEXT.index('st.radio("Navigate"')
 
+def test_nav_is_one_scrollable_row_not_wrapped():
+    # Live check found the 22 pills wrapping onto 3 rows; force nowrap.
+    assert "flex-wrap: nowrap !important" in CSS
+    assert "width: max-content" in CSS
+    assert "overflow-x: auto" in CSS
+
 def test_header_is_clean_white_bar():
     assert "box-shadow" in CSS
     assert ".pro-header" in CSS
