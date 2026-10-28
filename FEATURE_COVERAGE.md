@@ -151,3 +151,21 @@ evaluators, so they are listed honestly as the next phase instead.
 - NOT yet on GitHub/live at commit time: the previous market-batch web upload
   was still running, so this mock batch is committed locally and will be
   uploaded after that upload finishes, to avoid conflicting web edits.
+
+## Top-nav + main-form batch (2026-10-27)
+- Navigation moved to the TOP of the page: a horizontal "Choose a section"
+  menu, so a person can pick any section as they like without opening the
+  sidebar hamburger menu (the old mobile pain point).
+- Event form is now ALSO on the Home page, right under the headline
+  ("Step 1 — Create your plan here"), with the same fields as the sidebar
+  form. The sidebar form is kept for desktop, but is no longer required.
+- Submitting either form, or "Try a sample birthday plan", now goes
+  straight to the Plan page (previously it stayed on Home, which looked
+  like nothing had happened).
+- Plan page now has "Full plan at a glance": invitation text ready to
+  copy, day schedule, vendors to book, guest-scaled shopping/item list,
+  games for the event type, and music by moment — on top of the existing
+  budget split, checklist, risks, logistics and menu.
+- Tests: 174 pass (172 + 2 new top-nav tests); AppTest verified top nav
+  exists, sidebar submit lands on Plan, and the full-plan heading +
+  invitation appear.
