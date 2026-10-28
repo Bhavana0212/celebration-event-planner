@@ -1,22 +1,23 @@
-/* Professional theme — separated from app logic on purpose.
-   Party accent (deep magenta) + neutral professional neutrals, so the
-   site looks like a real product, not Streamlit's generic default. */
-.stApp { font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #111827; background: #FFFFFF; }
+/* Premium polish theme — Forest / Champagne / Ivory (reference palette).
+   Elegant + modern + trustworthy: dark forest headers, champagne accent,
+   ivory panels, charcoal text, serif headings, clean sans body.
+   Separated from app logic on purpose: planner/ = engine, app.py = screens,
+   this file = look. If the file is missing, the app still works. */
+.stApp { font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #30343B; background: #FFFFFF; }
 .block-container { max-width: 1180px; padding-top: 1.5rem; padding-bottom: 3rem; }
-.pro-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #F3E8FF; padding-bottom: 0.75rem; margin-bottom: 1rem; }
-.pro-header .pro-brand { font-size: 1.35rem; font-weight: 800; color: #9D174D; letter-spacing: -0.02em; }
+.pro-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #C6A477; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+.pro-header .pro-brand { font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; font-weight: 700; color: #24352E; letter-spacing: -0.02em; }
 .pro-header .pro-tag { font-size: 0.85rem; color: #6B7280; }
-h1, h2, h3 { color: #111827; letter-spacing: -0.02em; }
-h1 { font-size: 2.1rem; font-weight: 800; line-height: 1.15; }
-h2 { font-size: 1.45rem; font-weight: 700; margin-top: 1.5rem; border-bottom: 1px solid #F3F4F6; padding-bottom: 0.35rem; }
+h1, h2, h3 { color: #24352E; letter-spacing: -0.02em; }
+h1 { font-family: Georgia, "Times New Roman", serif; font-size: 2.2rem; font-weight: 700; line-height: 1.15; }
+h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; border-bottom: 1px solid #F7F3ED; padding-bottom: 0.35rem; }
 h3 { font-size: 1.1rem; font-weight: 700; }
-.stButton > button, .stFormSubmitButton > button { border-radius: 12px; padding: 0.6rem 1.4rem; font-weight: 600; border: 1px solid #E5E7EB; }
-.stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] { background: linear-gradient(135deg, #9D174D, #C026D3); color: #FFFFFF; border: none; box-shadow: 0 4px 14px rgba(157, 23, 77, 0.25); }
+.stButton > button, .stFormSubmitButton > button { border-radius: 14px; padding: 0.6rem 1.4rem; font-weight: 600; border: 1px solid #E5E7EB; min-height: 44px; }
+.stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] { background: #24352E; color: #FFFFFF; border: none; box-shadow: 0 4px 14px rgba(36, 53, 46, 0.25); }
 .stButton > button:hover, .stFormSubmitButton > button:hover { transform: translateY(-1px); }
-[data-testid="stMetric"] { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+[data-testid="stMetric"] { background: #F7F3ED; border: 1px solid #E5E7EB; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 [data-testid="stExpander"] { border: 1px solid #E5E7EB; border-radius: 14px; }
-div[data-testid="stRadio"][data-testid="stWidgetLabel"] + div { background: #FDF2F8; border-radius: 14px; padding: 0.5rem 0.75rem; }
 .stTextInput input, .stNumberInput input, .stSelectbox > div > div, .stTextArea textarea { border-radius: 10px; }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color: #9D174D !important; box-shadow: 0 0 0 1px #9D174D !important; }
+.stTextInput input:focus, .stTextArea textarea:focus { border-color: #24352E !important; box-shadow: 0 0 0 1px #24352E !important; }
 .stAlert { border-radius: 12px; }
-[data-testid="stSidebar"] { background: #F9FAFB; }
+[data-testid="stSidebar"] { background: #F7F3ED; }
