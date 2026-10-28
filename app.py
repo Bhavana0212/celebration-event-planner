@@ -221,7 +221,9 @@ def render_journey() -> None:
         for col, i in zip(cols, range(row, min(row + 3, len(JOURNEY_STEPS)))):
             (title, target, what), is_done = JOURNEY_STEPS[i], flags[i]
             with col.container(border=True):
-                st.write(f"**{i + 1}. {title}**")
+                # Single number only: JOURNEY_STEPS titles already start
+                # with "1. ", "2. ", etc., so do NOT add i+1 again here.
+                st.write(f"**{title}**")
                 st.write(what)
                 st.write("✓ Done" if is_done else ("▶ Next step" if i == next_idx else "○ Coming up"))
                 if plan is not None:
@@ -1450,8 +1452,17 @@ def main() -> None:
     # scrollable bar, the current page is highlighted, and the header
     # above and footer below stay exactly the same on every page — only
     # the middle content changes, like YouTube's header/footer pattern.
-    section = st.radio("Navigate", SECTIONS, key="nav_section", horizontal=True,
-                       help="Open navigation — scroll left/right to see every page. Header and footer stay the same, only the page in the middle changes.")
+    # Segmented control renders as clean pill buttons with NO radio
+    # circles at all — the previous radio + CSS-hide-circles approach
+    # failed live (circles still showed after a reboot), so do NOT go
+    # back to radio as the primary nav. Radio is only a fallback for
+    # very old Streamlit versions without segmented_control.
+    try:
+        section = st.segmented_control("Navigate", SECTIONS, key="nav_section",
+                                       help="Open navigation — scroll left/right to see every page. Header and footer stay the same, only the page in the middle changes.")
+    except AttributeError:
+        section = st.radio("Navigate", SECTIONS, key="nav_section", horizontal=True,
+                           help="Open navigation — scroll left/right to see every page. Header and footer stay the same, only the page in the middle changes.")
     with st.sidebar:
         st.divider()
         st.caption("Celebration & Event Planner · Hack2Skill Challenge 5")
