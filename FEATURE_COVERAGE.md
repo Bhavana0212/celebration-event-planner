@@ -329,3 +329,10 @@ evaluators, so they are listed honestly as the next phase instead.
 
 ## 2026-10-28 — Footer fix (live check found footer missing)
 - render_footer() was defined but never called in main() — fixed: it now runs at the end of every page (Home, Plan, info pages, all sections). AppTest confirms the pro-footer block renders.
+
+## 2026-10-28 — Open nav + persistent header/footer batch (user feedback: video looked like slides, need actual page-by-page work)
+- Nav is NO LONGER a dropdown: it is an open, horizontal, one-line scrollable radio bar ("Navigate", horizontal=True, CSS flex-wrap: nowrap + overflow-x: auto), Facebook top-bar style as reference only — every page visible, current page highlighted, scroll left/right on mobile.
+- Header/footer pattern like YouTube: pro-header is sticky at the top and render_footer() runs at the end of main() on every page, so header and footer stay exactly the same while only the middle page content changes — Home shows its form/wizard/dashboard, Plan shows its 4 tabs, Guests shows guest form, and so on, page by page.
+- Contact now includes Bhavana Shah's LinkedIn link (https://www.linkedin.com/in/bhavana-shah-875a85137), opening in the user's own app/browser; app still sends nothing.
+- FAQ is now general questions (What is this website? Who can use it? Is it free? Do I need an account? How do I start? Can I use it on my phone? plus wedding, privacy, keep-plan, booking/payment honesty).
+- Tests: new test_open_nav.py (4 tests); test_topnav and test_pages_stepper updated from selectbox to open radio nav. Total local test count to be re-checked after a full run — do not quote 195 until that run passes.
