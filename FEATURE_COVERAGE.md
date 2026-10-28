@@ -250,3 +250,28 @@ evaluators, so they are listed honestly as the next phase instead.
   web edits. Files to upload: app.py, .streamlit/config.toml,
   assets/professional-theme.css (new), tests/test_professional_theme.py
   (new), FEATURE_COVERAGE.md.
+
+## Step-by-step journey batch (2026-10-28, user: steps one by one, start to end, event fully set)
+- New "Complete journey — start to end, step by step" section at the top
+  of Home, in the user's exact sequence: 1 Celebration planning,
+  2 Guest list, 3 Budget, 4 Invitation, 5 Decor, 6 Food & Cake,
+  7 Music & Games, 8 Vendors & Shopping, 9 Seating, 10 Kids & Return
+  gifts, 11 Live Event Day, 12 Thank you & Memories.
+- Each step has an "Open →" button that goes straight to that section
+  (via the existing pending_section mechanism); before a plan exists,
+  steps 2–12 honestly say "Create plan first" instead of opening an
+  empty section.
+- Progress is honest, not faked: a progress bar + "X of 12 steps done"
+  + "Next step" line, computed from real session data only (plan,
+  real_guests, expenses, decor_shopping/mood_notes, menu inputs,
+  playlist/song requests/scores, custom_vendors/cart, seating,
+  goodie_items, announcements/poll, guestbook/photos/gifts). Steps 1
+  and 4 are ready with the plan itself, because the plan generates
+  the checklist and the invitation — that is stated in the caption.
+- When all 12 are done: "🎉 All steps done — your event is fully set!"
+- Tests: 185 pass (183 + 2 new journey tests); AppTest verified: no
+  exception, journey subheader + 0/12 progress with no plan, and after
+  the 1-tap sample plan the journey buttons appear.
+- NOT yet uploaded at commit time: the professional-theme GitHub upload
+  was still running, so this batch uploads after it to avoid
+  conflicting web edits.
