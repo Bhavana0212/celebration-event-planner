@@ -1,23 +1,28 @@
-/* Premium polish theme — Forest / Champagne / Ivory (reference palette).
-   Elegant + modern + trustworthy: dark forest headers, champagne accent,
-   ivory panels, charcoal text, serif headings, clean sans body.
-   Separated from app logic on purpose: planner/ = engine, app.py = screens,
-   this file = look. If the file is missing, the app still works. */
-.stApp { font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #30343B; background: #FFFFFF; }
-.block-container { max-width: 1180px; padding-top: 1.5rem; padding-bottom: 3rem; }
-.pro-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #C6A477; padding-bottom: 0.75rem; margin-bottom: 1rem; }
-.pro-header .pro-brand { font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; font-weight: 700; color: #24352E; letter-spacing: -0.02em; }
-.pro-header .pro-tag { font-size: 0.85rem; color: #6B7280; }
-h1, h2, h3 { color: #24352E; letter-spacing: -0.02em; }
-h1 { font-family: Georgia, "Times New Roman", serif; font-size: 2.2rem; font-weight: 700; line-height: 1.15; }
-h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; border-bottom: 1px solid #F7F3ED; padding-bottom: 0.35rem; }
+/* Celebration vibe + premium polish: magenta party colour, gold accent,
+   warm ivory background — Forest was too serious and gave no celebration
+   feeling, so the palette is back to festive, but kept clean and consistent.
+   Separated from app logic: planner/ = engine, app.py = screens, this = look. */
+.stApp { font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif; color: #1F2937; background: #FFF7ED; }
+.block-container { max-width: 1180px; padding-top: 2.5rem; padding-bottom: 3rem; }
+.pro-header { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; align-items: center; border-bottom: 3px solid #F59E0B; padding-bottom: 0.75rem; margin-bottom: 1rem; margin-top: 0.5rem; }
+.pro-header .pro-brand { font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 700; color: #C026D3; letter-spacing: -0.02em; white-space: normal; word-break: break-word; }
+.pro-header .pro-tag { font-size: 0.8rem; color: #6B7280; white-space: normal; }
+h1, h2, h3 { color: #831843; letter-spacing: -0.02em; }
+h1 { font-family: Georgia, "Times New Roman", serif; font-size: 2.1rem; font-weight: 700; line-height: 1.15; }
+h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.45rem; font-weight: 700; margin-top: 1.5rem; border-bottom: 1px solid #FDE68A; padding-bottom: 0.35rem; }
 h3 { font-size: 1.1rem; font-weight: 700; }
 .stButton > button, .stFormSubmitButton > button { border-radius: 14px; padding: 0.6rem 1.4rem; font-weight: 600; border: 1px solid #E5E7EB; min-height: 44px; }
-.stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] { background: #24352E; color: #FFFFFF; border: none; box-shadow: 0 4px 14px rgba(36, 53, 46, 0.25); }
+.stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] { background: linear-gradient(135deg, #C026D3, #DB2777); color: #FFFFFF; border: none; box-shadow: 0 4px 14px rgba(192, 38, 211, 0.3); }
 .stButton > button:hover, .stFormSubmitButton > button:hover { transform: translateY(-1px); }
-[data-testid="stMetric"] { background: #F7F3ED; border: 1px solid #E5E7EB; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-[data-testid="stExpander"] { border: 1px solid #E5E7EB; border-radius: 14px; }
+[data-testid="stMetric"] { background: #FFFFFF; border: 1px solid #FDE68A; border-radius: 16px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); min-width: 0; }
+[data-testid="stMetricValue"] { font-size: 1.4rem; white-space: normal; word-break: break-word; }
+[data-testid="stExpander"] { border: 1px solid #FDE68A; border-radius: 14px; }
 .stTextInput input, .stNumberInput input, .stSelectbox > div > div, .stTextArea textarea { border-radius: 10px; }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color: #24352E !important; box-shadow: 0 0 0 1px #24352E !important; }
+.stTextInput input:focus, .stTextArea textarea:focus { border-color: #C026D3 !important; box-shadow: 0 0 0 1px #C026D3 !important; }
 .stAlert { border-radius: 12px; }
-[data-testid="stSidebar"] { background: #F7F3ED; }
+[data-testid="stSidebar"] { background: #FDF2F8; }
+@media (max-width: 640px) {
+  .block-container { padding-top: 3rem; padding-left: 1rem; padding-right: 1rem; }
+  .pro-brand { font-size: 1.1rem !important; }
+  h1 { font-size: 1.7rem; }
+}
