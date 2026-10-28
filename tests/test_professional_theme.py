@@ -14,6 +14,6 @@ def test_theme_file_and_loader():
 
 def test_config_is_professional_not_generic():
     # Superseded by premium polish: Forest/Champagne/Ivory, not deep magenta.
-    assert "#C026D3" in CFG
+    assert "#E91E8C" in CFG
     assert "#1F2937" in CFG
-    assert "#FFF7ED" in CFG
+    assert "#FFF5F9" in CFG
