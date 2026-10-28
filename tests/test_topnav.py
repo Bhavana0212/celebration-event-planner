@@ -7,8 +7,10 @@ APP = str(Path(__file__).resolve().parents[1] / "app.py")
 def test_top_navigation_exists():
     at = AppTest.from_file(APP, default_timeout=60).run()
     assert not at.exception
-    # Open nav, not a dropdown: a horizontal radio bar labelled Navigate.
-    assert any(s.label == "Navigate" for s in at.radio)
+    # Open nav, not a dropdown: segmented-control pills labelled Navigate
+    # (radio only as a fallback for very old Streamlit).
+    nav_widgets = list(getattr(at, "segmented_control", [])) + list(at.radio)
+    assert any(s.label == "Navigate" for s in nav_widgets)
     assert not any(s.label == "Navigate to a page" for s in at.selectbox)
 
 def test_sidebar_has_no_form_and_wizard_lands_on_plan():
