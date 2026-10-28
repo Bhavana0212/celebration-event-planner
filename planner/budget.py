@@ -30,6 +30,16 @@ BASE_SHARES = {
     "Festival / Cultural": (0.15, 0.35, 0.20, 0.12, 0.05, 0.03, 0.10),
     "Graduation":          (0.20, 0.38, 0.10, 0.08, 0.08, 0.06, 0.10),
     "Community Event":     (0.18, 0.34, 0.16, 0.12, 0.05, 0.05, 0.10),
+    "Engagement":          (0.24, 0.30, 0.13, 0.08, 0.09, 0.06, 0.10),
+    "Retirement":          (0.20, 0.35, 0.10, 0.10, 0.06, 0.09, 0.10),
+    "Housewarming":        (0.15, 0.35, 0.18, 0.08, 0.04, 0.10, 0.10),
+    "Farewell":            (0.18, 0.35, 0.12, 0.12, 0.05, 0.08, 0.10),
+    "Holiday Party":       (0.20, 0.35, 0.15, 0.12, 0.05, 0.03, 0.10),
+    "Dinner Party":        (0.15, 0.45, 0.10, 0.08, 0.05, 0.07, 0.10),
+    "Surprise Party":      (0.20, 0.35, 0.12, 0.10, 0.06, 0.07, 0.10),
+    "Family Reunion":      (0.18, 0.38, 0.12, 0.08, 0.06, 0.08, 0.10),
+    "School / College Event": (0.15, 0.30, 0.15, 0.18, 0.05, 0.07, 0.10),
+    "Sports Celebration":  (0.20, 0.32, 0.10, 0.18, 0.05, 0.05, 0.10),
 }
 
 # Typical comfortable spend per guest (INR) used to judge feasibility.
@@ -42,6 +52,16 @@ BASELINE_PER_HEAD = {
     "Festival / Cultural": 1000,
     "Graduation": 1500,
     "Community Event": 1200,
+    "Engagement": 2000,
+    "Retirement": 1500,
+    "Housewarming": 1200,
+    "Farewell": 1300,
+    "Holiday Party": 1300,
+    "Dinner Party": 1500,
+    "Surprise Party": 1200,
+    "Family Reunion": 1200,
+    "School / College Event": 800,
+    "Sports Celebration": 1000,
 }
 
 VIBE_ADJUST = {
@@ -90,7 +110,7 @@ def _multipliers(req: EventRequest) -> dict[str, float]:
 
 
 def classify_tier(per_head: float, event_type: str) -> str:
-    ratio = per_head / BASELINE_PER_HEAD[event_type]
+    ratio = per_head / BASELINE_PER_HEAD.get(event_type, BASELINE_PER_HEAD["Community Event"])
     if ratio < 0.6:
         return "Very tight"
     if ratio < 0.9:
@@ -102,7 +122,7 @@ def classify_tier(per_head: float, event_type: str) -> str:
 
 def allocate_budget(req: EventRequest) -> BudgetSummary:
     """Split the budget across categories based on the event context."""
-    base = dict(zip(CATEGORIES, BASE_SHARES[req.event_type]))
+    base = dict(zip(CATEGORIES, BASE_SHARES.get(req.event_type, BASE_SHARES["Community Event"])))
     mult = _multipliers(req)
     raw = {c: base[c] * mult[c] for c in CATEGORIES}
     total = sum(raw.values())

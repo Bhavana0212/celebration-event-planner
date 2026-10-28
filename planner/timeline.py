@@ -48,6 +48,26 @@ _EVENT_TASKS = {
         ("Confirm ceremony schedule with the institution", "Planning", 30),
         ("Prepare slideshow and photo wall", "Decor", 14),
     ),
+    "Engagement": (
+        ("Book ring / ceremony venue and confirm families", "Planning", 60),
+        ("Plan engagement photo session", "Decor", 21),
+    ),
+    "Retirement": (
+        ("Collect farewell messages and memory video clips", "Entertainment", 30),
+        ("Plan farewell gift and speech time", "Planning", 14),
+    ),
+    "Housewarming": (
+        ("Confirm home setup and parking for guests", "Logistics", 14),
+        ("Plan house tour and welcome drinks", "Planning", 7),
+    ),
+    "Holiday Party": (
+        ("Order seasonal decor and themed menu", "Decor", 30),
+        ("Plan secret-Santa / gift exchange rules", "Entertainment", 14),
+    ),
+    "Family Reunion": (
+        ("Collect family photos for a memory wall", "Decor", 30),
+        ("Confirm travel and stay for out-of-town family", "Guests", 45),
+    ),
     "Community Event": (
         ("Confirm community hall / permits", "Planning", 30),
         ("Recruit volunteers and assign roles", "Logistics", 21),

@@ -12,10 +12,20 @@ EVENT_TYPES = (
     "Wedding",
     "Anniversary",
     "Baby Shower",
+    "Engagement",
     "Corporate Party",
     "Festival / Cultural",
     "Graduation",
     "Community Event",
+    "Retirement",
+    "Housewarming",
+    "Farewell",
+    "Holiday Party",
+    "Dinner Party",
+    "Surprise Party",
+    "Family Reunion",
+    "School / College Event",
+    "Sports Celebration",
 )
 CURRENCIES = ("INR", "USD", "CAD", "GBP", "EUR")
 CURRENCY_SYMBOLS = {"INR": "₹", "USD": "$", "CAD": "C$", "GBP": "£", "EUR": "€"}
@@ -70,6 +80,8 @@ class EventRequest:
     currency: str = "INR"
     # Added in the audit fix: event time as "HH:MM" text, default empty.
     event_time: str = ""
+    # Market batch: optional end date for multi-day events, default None.
+    end_date: date | None = None
 
     def validated(self, today: date | None = None) -> "EventRequest":
         """Return a sanitised copy, or raise ValidationError listing every problem."""
@@ -86,6 +98,8 @@ class EventRequest:
             errors.append("Budget must be greater than 0 and realistic")
         if self.event_date < today:
             errors.append("Event date cannot be in the past")
+        if self.end_date is not None and self.end_date < self.event_date:
+            errors.append("End date cannot be before the event date")
 
         city = clean_text(self.city, MAX_CITY)
         if city and not _CITY_RE.match(city):
@@ -109,6 +123,7 @@ class EventRequest:
             notes=clean_text(self.notes, MAX_NOTES),
             event_name=clean_text(self.event_name, 120),
             event_time=time_text,
+            end_date=self.end_date,
         )
 
     @staticmethod

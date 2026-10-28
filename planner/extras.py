@@ -23,6 +23,16 @@ VENDORS = {
     "Festival / Cultural": ["Venue", "Caterer", "Decorator", "Photographer", "Sound System", "Performers"],
     "Graduation": ["Venue", "Caterer", "Decorator", "Photographer", "DJ"],
     "Community Event": ["Venue", "Caterer", "Decorator", "Photographer", "Sound System", "Volunteers"],
+    "Engagement": ["Venue", "Caterer", "Decorator", "Photographer", "DJ", "Cake Shop"],
+    "Retirement": ["Venue", "Caterer", "Decorator", "Photographer", "Host / MC"],
+    "Housewarming": ["Caterer", "Decorator", "Photographer"],
+    "Farewell": ["Venue", "Caterer", "Decorator", "DJ"],
+    "Holiday Party": ["Venue", "Caterer", "Decorator", "DJ", "Photographer"],
+    "Dinner Party": ["Caterer", "Decorator"],
+    "Surprise Party": ["Venue", "Caterer", "Decorator", "Cake Shop", "Photographer"],
+    "Family Reunion": ["Venue", "Caterer", "Decorator", "Photographer", "Sound System"],
+    "School / College Event": ["Venue", "Caterer", "Decorator", "Sound / AV", "Host / MC"],
+    "Sports Celebration": ["Venue", "Caterer", "Decorator", "DJ", "Photographer"],
 }
 
 DAY_SCHEDULE = {

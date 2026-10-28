@@ -25,6 +25,12 @@ THEMES = {
               "ideas": ["Seashell centrepieces", "Fairy lights", "Barefoot photo corner"]},
     "Winter Wonderland": {"colors": ["#0D47A1", "#BBDEFB", "#FFFFFF", "#E0E0E0"],
                           "ideas": ["Snowflake decor", "White lights", "Hot chocolate station"]},
+    "Superhero": {"colors": ["#D32F2F", "#1565C0", "#FFEB3B", "#FFFFFF"],
+                  "ideas": ["City skyline backdrop", "Cape photo booth", "Hero return gifts"]},
+    "Princess / Fairy": {"colors": ["#F06292", "#BA68C8", "#FFF9C4", "#FFFFFF"],
+                         "ideas": ["Castle backdrop", "Tiara station", "Pink balloon arch"]},
+    "Dinosaur": {"colors": ["#33691E", "#8BC34A", "#FFCC80", "#FFFFFF"],
+                 "ideas": ["Dino footprints trail", "Fossil dig station", "Jungle backdrop"]},
 }
 
 DECOR_SECTIONS = {
@@ -41,8 +47,8 @@ DECOR_SECTIONS = {
 }
 
 SAMPLE_VENDORS = [
-    {"name": "Dream Venue Hall", "category": "Venue", "city": "Toronto", "rating": 4.7, "price_from": 50000, "available": "Weekends"},
-    {"name": "Garden Banquet", "category": "Venue", "city": "Mumbai", "rating": 4.5, "price_from": 80000, "available": "All week"},
+    {"name": "Dream Venue Hall", "category": "Venue", "city": "Toronto", "rating": 4.7, "price_from": 50000, "available": "Weekends", "capacity": 200, "indoor": "Indoor"},
+    {"name": "Garden Banquet", "category": "Venue", "city": "Mumbai", "rating": 4.5, "price_from": 80000, "available": "All week", "capacity": 300, "indoor": "Indoor + Outdoor"},
     {"name": "Tasty Bites Catering", "category": "Caterer", "city": "Toronto", "rating": 4.8, "price_from": 1200, "available": "All week"},
     {"name": "Sweet Layers Bakery", "category": "Baker", "city": "Toronto", "rating": 4.9, "price_from": 5000, "available": "Order 7 days ahead"},
     {"name": "Lens & Light Studio", "category": "Photographer", "city": "Mumbai", "rating": 4.6, "price_from": 25000, "available": "Weekends"},
@@ -110,4 +116,10 @@ EVENT_TEMPLATES = [
     {"name": "Baby Shower — Garden", "event_type": "Baby Shower", "guests": 40, "theme": "Garden"},
     {"name": "Corporate Party — Minimalist", "event_type": "Corporate Party", "guests": 100, "theme": "Minimalist"},
     {"name": "Graduation — Rainbow / Fun", "event_type": "Graduation", "guests": 60, "theme": "Rainbow / Fun"},
+    {"name": "Engagement — Elegant Gold", "event_type": "Engagement", "guests": 80, "theme": "Elegant Gold"},
+    {"name": "Retirement — Garden", "event_type": "Retirement", "guests": 60, "theme": "Garden"},
+    {"name": "Housewarming — Minimalist", "event_type": "Housewarming", "guests": 40, "theme": "Minimalist"},
+    {"name": "Holiday Party — Winter Wonderland", "event_type": "Holiday Party", "guests": 80, "theme": "Winter Wonderland"},
+    {"name": "Surprise Birthday — Superhero", "event_type": "Surprise Party", "guests": 50, "theme": "Superhero"},
+    {"name": "Family Reunion — Rainbow / Fun", "event_type": "Family Reunion", "guests": 100, "theme": "Rainbow / Fun"},
 ]
