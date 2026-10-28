@@ -323,3 +323,6 @@ evaluators, so they are listed honestly as the next phase instead.
 - Journey is now a horizontal process graph (Step 1 → Step 2 → …): ✓ done, ▶ next step, numbered coming up — plus 3-column step cards with Open buttons. No "Pending" table, no "Create plan first" column.
 - Form first on Home: wizard/dashboard now sit right after the hero and example button, journey comes after — nobody scrolls to the bottom to fill a form. Content lives between header and footer.
 - 195 tests pass (new test_pages_stepper.py; topnav test updated to the selectbox navbar).
+
+## 2026-10-28 — Popping colours batch (user feedback: colours should pop more)
+- Vivid popping palette: primary #E91E8C (bright pink), gradient buttons pink → orange #FF7A00, gold accent #FFB800, bright pink-tinted background #FFF5F9, sidebar #FFE4F1. No extra cost, theme files only.
