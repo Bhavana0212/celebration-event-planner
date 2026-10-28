@@ -108,3 +108,31 @@ evaluators, so they are listed honestly as the next phase instead.
 - Catalog: 3 new decor sections, 3 new games, 3 new event templates (Baby Shower, Corporate Party, Graduation).
 - Tests: 112 passed (107 previous + 5 new audit-fix tests).
 - Still next phase, not faked: real accounts/OAuth, real payments/checkout, real vendor bookings, 3D/AR, live multi-user sync, email/SMS sending, hosted custom event URLs.
+
+## Market batch (2026-10-27, after the full 200+ feature list check)
+- Event types expanded 8 -> 18: Engagement, Retirement, Housewarming, Farewell,
+  Holiday Party, Dinner Party, Surprise Party, Family Reunion, School / College
+  Event, Sports Celebration added, each with its own budget split (sums to 1.0)
+  and per-guest baseline, vendor checklist and timeline tasks where applicable.
+  Budget code now falls back to Community Event instead of crashing on an
+  unknown type. 169 tests pass (162 + 7 new market-batch tests).
+- Multi-day events: optional End date in the sidebar form, validated
+  (end >= start), saved with saved events, loaded back, and shown as a range.
+- Custom tasks now have a Priority (High / Medium / Low) shown next to the title.
+- Venue comparison: sample venues now carry capacity + indoor/outdoor, and a
+  side-by-side comparison table is shown in Vendors & Shopping before the
+  directory, with a note that real venue booking is not done by this app.
+- Home metrics are now dynamic (event-type and budget-category counts from
+  code, not hard-coded numbers). Themes added: Superhero, Princess / Fairy,
+  Dinosaur. Templates added for Engagement, Retirement, Housewarming,
+  Holiday Party, Surprise Party and Family Reunion (13+ templates total).
+- Local Streamlit HTTP 200 verified for this batch.
+- STILL next phase, NOT faked by this batch: real sign-up/login/OAuth,
+  email verification, password reset, 2FA, real payments/checkout, real
+  vendor/venue bookings, real email/SMS/push sending, live multi-user sync,
+  3D/AR floor planning, hosted custom event URLs, vendor marketplace with
+  payouts, admin panel at scale, full multi-language UI. Those need a
+  backend, database, auth and payment provider — a Streamlit patch cannot
+  honestly deliver them, and adding fake buttons for them would mislead
+  users. Market launch as a free, no-account, single-session planner is
+  real today; the super-platform version is a rebuild, not a patch.

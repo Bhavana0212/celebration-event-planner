@@ -114,6 +114,8 @@ def sidebar_plan_form() -> EventRequest | None:
             currency = st.selectbox("Currency", CURRENCIES, index=0)
             event_date = st.date_input("Event date", date.today() + timedelta(days=60),
                                        min_value=date.today())
+            end_date = st.date_input("End date (optional, for multi-day events)", value=None,
+                                     min_value=date.today())
             event_time = st.time_input("Event time (optional)", value=None)
             city = st.text_input("City (optional)", max_chars=MAX_CITY)
             theme = st.text_input("Theme (optional)", "Space")
@@ -131,7 +133,8 @@ def sidebar_plan_form() -> EventRequest | None:
     st.session_state["event_time"] = time_text
     return EventRequest(event_type, int(guests), float(budget), event_date, city, vibe,
                         tuple(dietary), tuple(access), outdoor, notes,
-                        event_name=event_name, currency=currency, event_time=time_text)
+                        event_name=event_name, currency=currency, event_time=time_text,
+                        end_date=end_date)
 
 
 def render_home(plan: Plan | None) -> None:
@@ -197,8 +200,8 @@ def render_home(plan: Plan | None) -> None:
                    f"{plan.days_left} days to go. Use the sections on the left to manage it.")
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Event types", "8")
-        c2.metric("Budget categories", "18")
+        c1.metric("Event types", str(len(EVENT_TYPES)))
+        c2.metric("Budget categories", str(len(BUDGET_CATEGORIES)))
         c3.metric("Sample vendors", str(len(SAMPLE_VENDORS)))
         c4.metric("Games in library", str(len(GAMES_LIBRARY)))
     st.subheader("How it works")
@@ -255,17 +258,20 @@ def render_home(plan: Plan | None) -> None:
                       "vibe": r.vibe, "dietary": list(r.dietary), "accessibility": list(r.accessibility),
                       "outdoor": r.outdoor, "notes": r.notes, "currency": r.currency,
                       "event_time": r.event_time,
+                      "end_date": r.end_date.isoformat() if r.end_date else "",
                       "theme": st.session_state.get("theme", "")})
         st.success("Saved in this session. Download it from Post-Event / Export to keep it.")
     for i, saved in enumerate(store("saved_events", [])):
         col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
-        col1.write(f"**{saved['event_name'] or saved['event_type']}** — {saved['event_type']}, {saved['event_date']}{', ' + saved['event_time'] if saved.get('event_time') else ''}, {saved['guests']} guests")
+        _ed = saved.get("end_date") or ""
+        col1.write(f"**{saved['event_name'] or saved['event_type']}** — {saved['event_type']}, {saved['event_date']}{(' to ' + _ed) if _ed else ''}{', ' + saved['event_time'] if saved.get('event_time') else ''}, {saved['guests']} guests")
         if col2.button("Load", key=f"load_{i}"):
             req = EventRequest(saved["event_type"], saved["guests"], saved["budget"],
                                date.fromisoformat(saved["event_date"]), saved["city"], saved["vibe"],
                                tuple(saved["dietary"]), tuple(saved["accessibility"]),
                                saved["outdoor"], saved["notes"], event_name=saved["event_name"],
-                               currency=saved["currency"], event_time=saved.get("event_time", ""))
+                               currency=saved["currency"], event_time=saved.get("event_time", ""),
+                               end_date=date.fromisoformat(saved["end_date"]) if saved.get("end_date") else None)
             st.session_state["theme"] = saved.get("theme", "")
             st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
             st.rerun()
@@ -311,12 +317,13 @@ def render_plan(plan: Plan) -> None:
     st.caption("Your own tasks, in this session, alongside the engine checklist above.")
     tasks = store("custom_tasks", [])
     with st.form("add_task", clear_on_submit=True):
-        t1, t2 = st.columns([3, 1])
+        t1, t2, t3 = st.columns([3, 1, 1])
         t_title = t1.text_input("Task title *", max_chars=120)
         t_due = t2.date_input("Due date (optional)", value=None)
+        t_pri = t3.selectbox("Priority", ["High", "Medium", "Low"], index=1)
         if st.form_submit_button("Add task"):
             if t_title.strip():
-                tasks.append({"title": t_title.strip(), "due": t_due.isoformat() if t_due else "", "done": False})
+                tasks.append({"title": t_title.strip(), "due": t_due.isoformat() if t_due else "", "done": False, "priority": t_pri})
                 st.success(f"Added: {t_title.strip()}")
     for i, t in enumerate(list(tasks)):
         c1, c2, c3 = st.columns([1, 5, 1])
@@ -324,7 +331,7 @@ def render_plan(plan: Plan) -> None:
             tasks[i]["done"] = True
         else:
             tasks[i]["done"] = False
-        c2.write(f"{t['title']}{' — due ' + t['due'] if t.get('due') else ''}")
+        c2.write(f"{t['title']} [{t.get('priority', 'Medium')}]{' — due ' + t['due'] if t.get('due') else ''}")
         if c3.button("Delete", key=f"task_del_{i}"):
             tasks.pop(i)
             st.rerun()
@@ -724,6 +731,12 @@ def render_decor(plan: Plan) -> None:
 
 
 def render_vendors_shopping(plan: Plan) -> None:
+    st.subheader("Venue comparison — sample venues, side by side")
+    st.caption("Sample venues only, with capacity and starting price, so you can compare before you contact a real venue. Real venue booking is not done by this app.")
+    venues = [v for v in SAMPLE_VENDORS if v["category"] == "Venue"]
+    if venues:
+        st.table([{k: v.get(k, "") for k in ("name", "city", "capacity", "indoor", "rating", "price_from", "available")} for v in venues])
+        st.write(f"For {plan.request.guests} guests, venues above with capacity under your guest count will feel tight — check capacity before shortlisting.")
     st.subheader("Vendor directory — search, filter, compare")
     cat_f = st.selectbox("Vendor category", ["All"] + sorted({v["category"] for v in SAMPLE_VENDORS}))
     city_f = st.text_input("City filter (optional)", placeholder="e.g. Toronto")
