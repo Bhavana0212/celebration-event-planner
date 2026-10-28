@@ -313,9 +313,10 @@ def render_dashboard(plan) -> None:
         st.write(f"**Upcoming celebration: {plan.request.event_name or plan.request.event_type}**")
         st.write(f"{plan.days_left} days to go · {plan.request.event_date.isoformat()} · {plan.request.guests} guests expected")
         st.progress(done / len(JOURNEY_STEPS), text=f"Planning progress: {done} of {len(JOURNEY_STEPS)} steps done")
-        d1, d2, d3, d4 = st.columns(4)
+        d1, d2 = st.columns(2)
         d1.metric("Budget planned", money(plan.request.budget, plan.request.currency))
         d2.metric("Spent so far", money(spent, plan.request.currency))
+        d3, d4 = st.columns(2)
         d3.metric("Remaining", money(plan.request.budget - spent, plan.request.currency))
         d4.metric("Guests attending", f"{attending} / {len(guests) if guests else plan.request.guests}")
         nxt = next((JOURNEY_STEPS[i][0] for i, f in enumerate(flags) if not f), None)
@@ -403,163 +404,106 @@ def render_home(plan: Plan | None) -> None:
         st.session_state["pending_section"] = "Plan"
         st.rerun()
     st.caption("Or create your own plan with the 7-step wizard above — no sidebar form anymore.")
-    st.subheader("Explore everything — tap any card, no searching in the sidebar")
-    st.caption("If you have no plan yet, tapping a card opens it with a sample birthday plan, "
-               "so you can see every feature at first look. Then create your own plan with the wizard above.")
-    quick = {
-        "Plan": "Budget split, checklist, risks, logistics and menu.",
-        "Guests & Invites": "Guest list, RSVP, invitations, WhatsApp, email and QR.",
-        "Budget & Expenses": "Planned vs actual spending, paid/unpaid, reports.",
-        "Food & Cake": "Menu, dietary-safe dishes, cake size, leftover tracker.",
-        "Music & Games": "Playlist, song requests, games, quiz, scores, lucky draw.",
-        "Kids": "Age-wise activities, themes, goodie bags, safety checklist.",
-        "Decor & Design": "Themes, colours, decor planners and shopping list.",
-        "Vendors & Shopping": "Sample vendors, your vendors, shopping cart (estimates).",
-        "Seating & Floor Plan": "Group-wise seating and a 2D floor-plan schematic.",
-        "Live Event Day": "Run sheet, check-in, polls, announcements, incidents.",
-        "Post-Event & Memories": "Photos, collage, guestbook, gifts, final report.",
-        "AI Assistant": "Ask about your event, get ideas and budget tips.",
-        "Profile & Settings": "Your local profile, backup/restore, pricing preview.",
-        "Previews (Mock)": "Mock views of login, checkout, booking, 3D plan and admin — preview only, nothing real happens here.",
-    }
-    cols = st.columns(2)
-    for i, (section, desc) in enumerate(quick.items()):
-        with cols[i % 2].container(border=True):
-            st.write(f"**{section}**")
-            st.write(desc)
-            if st.button(f"Open {section}", key=f"quick_{section}"):
-                if plan is None:
-                    req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
-                                       "Toronto", "Fun & Playful", (), (), False,
-                                       "Space theme, kids love science",
-                                       event_name="Ava's 10th Birthday Bash", currency="CAD")
-                    st.session_state["theme"] = "Space"
-                    st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
-                # Do NOT set nav_section here: the top radio with that
-                # key is already instantiated by the time Home renders.
-                # main() picks pending_section up before creating the radio.
-                st.session_state["pending_section"] = section
+    st.caption("Every section is in the top menu above — or follow your 12-step journey, one step at a time. No need to scroll through everything here.")
+    with st.expander("More about this planner — why this one, how it works, templates, FAQ, saved events"):
+        st.subheader("Why this one — free, all-in-one, for every event")
+        st.write("Eventbrite is best for paid public tickets (with per-ticket fees). Partiful is best for stylish casual invites. "
+                 "Zola is best for weddings only, with a real gift shop. This planner is different: it is **free, needs no account, "
+                 "covers every event type, and puts budget, guests, vendors, food, games, seating and memories in one place** — "
+                 "with structured data competitors miss (dietary that actually filters the menu, plus-ones counted, budget that always adds up). "
+                 "It does NOT sell tickets or gifts — those need paid gateways, and are not faked here.")
+        st.subheader("What to do on each page — in plain words")
+        st.write("**Home:** Start here — form or 1-tap example.  •  **Plan:** Your full plan, budget and checklist.  •  "
+                 "**Guests:** Add guests, see RSVP, copy invitation, share on WhatsApp.  •  **Budget:** Add what you actually spent, see what is left.  •  "
+                 "**Food:** Menu, cake size, leftovers.  •  **Music & Games:** Playlist, games, scores.  •  **Kids:** Activities by age.  •  "
+                 "**Decor:** Themes and colours.  •  **Vendors:** Compare vendors, add your own.  •  **Seating:** Who sits where.  •  "
+                 "**Live Day:** On the day — check-in, polls, announcements.  •  **Post-Event:** Photos, guestbook, final report.  •  "
+                 "**AI Assistant:** Ask a question about your event.  •  **Profile:** Backup and delete your data.  •  "
+                 "**Previews:** Mock views of future features, labelled as previews.")
+        with st.expander("How to use this website in 30 seconds (read this first)"):
+            st.write("1. Open the link. No login.\n2. Tap 'See an example first' OR fill the form and click 'Create my full plan'.\n"
+                     "3. Your plan opens on the Plan page — invitation, budget, checklist, schedule, vendors, food, games, all in one place.\n"
+                     "4. Tap a name in the top menu to change that part — e.g. Guests to add people, Budget to add expenses.\n"
+                     "5. When done, go to Post-Event to download your plan (PDF / Markdown / calendar) or share the WhatsApp summary from Plan.")
+        st.subheader("How it works")
+        a, b, c = st.columns(3)
+        with a.container(border=True):
+            st.write("**1. Tell us about your event**")
+            st.write("Guests, budget, date, vibe, and dietary or accessibility needs.")
+        with b.container(border=True):
+            st.write("**2. Get your full plan**")
+            st.write("Budget, checklist, menu, risks, seating, games and music — instantly.")
+        with c.container(border=True):
+            st.write("**3. Run it live**")
+            st.write("Check guests in, track vendors, share updates, then save memories.")
+        st.subheader("What you get")
+        d, e, f, g = st.columns(4)
+        with d.container(border=True):
+            st.write("**Budget, clearly**")
+            st.write("A split that always adds up to your total, plus actual spending.")
+        with e.container(border=True):
+            st.write("**Guests, organised**")
+            st.write("RSVP, dietary needs, seating and check-in in one list.")
+        with f.container(border=True):
+            st.write("**Vendors, compared**")
+            st.write("Prices, status and contacts — no spreadsheets needed.")
+        with g.container(border=True):
+            st.write("**The day itself**")
+            st.write("A run sheet, live polls and announcements for event day.")
+        st.subheader("Start from a template")
+        for t in EVENT_TEMPLATES:
+            if st.button(f"Use template: {t['name']}", key=f"tpl_{t['name']}"):
+                req = EventRequest(t["event_type"], t["guests"], 100000.0,
+                                   date.today() + timedelta(days=60), "Toronto", "Fun & Playful",
+                                   (), (), False, "", event_name=t["name"], currency="CAD")
+                st.session_state["theme"] = t["theme"]
+                st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
                 st.rerun()
-    if plan is not None:
-        st.success(f"Current event: **{plan.request.event_name or plan.request.event_type}** — "
-                   f"{plan.days_left} days to go. Use the section menu at the top of the page to manage it.")
-        st.subheader("Your plan readiness — at a glance")
-        _guests = len(store("real_guests", []))
-        _att = sum(1 for g in store("real_guests", []) if g.get("RSVP") == "Attending")
-        _exp = len(store("expenses", []))
-        _ven = len(store("custom_vendors", []))
-        _tasks_done = sum(1 for x in store("custom_tasks", []) if x.get("done"))
-        _tasks_all = len(store("custom_tasks", []))
-        _checks = [bool(_guests), bool(_exp), bool(_ven), _tasks_all > 0 and _tasks_done == _tasks_all]
-        st.progress(sum(_checks) / len(_checks), text=f"Readiness: {sum(_checks)} of {len(_checks)} areas started/finished")
-        rc1, rc2, rc3, rc4 = st.columns(4)
-        rc1.metric("Guests listed", _guests); rc2.metric("Attending", _att)
-        rc3.metric("Expenses tracked", _exp); rc4.metric("Vendors added", _ven)
-        st.caption("Readiness is a simple progress count (guests, expenses, vendors, my tasks) — not a quality score, and not ticket sales.")
-    with st.container(border=True):
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Event types", str(len(EVENT_TYPES)))
-        c2.metric("Budget categories", str(len(BUDGET_CATEGORIES)))
-        c3.metric("Sample vendors", str(len(SAMPLE_VENDORS)))
-        c4.metric("Games in library", str(len(GAMES_LIBRARY)))
-    st.subheader("Why this one — free, all-in-one, for every event")
-    st.write("Eventbrite is best for paid public tickets (with per-ticket fees). Partiful is best for stylish casual invites. "
-             "Zola is best for weddings only, with a real gift shop. This planner is different: it is **free, needs no account, "
-             "covers every event type, and puts budget, guests, vendors, food, games, seating and memories in one place** — "
-             "with structured data competitors miss (dietary that actually filters the menu, plus-ones counted, budget that always adds up). "
-             "It does NOT sell tickets or gifts — those need paid gateways, and are not faked here.")
-    st.subheader("What to do on each page — in plain words")
-    st.write("**Home:** Start here — form or 1-tap example.  •  **Plan:** Your full plan, budget and checklist.  •  "
-             "**Guests:** Add guests, see RSVP, copy invitation, share on WhatsApp.  •  **Budget:** Add what you actually spent, see what is left.  •  "
-             "**Food:** Menu, cake size, leftovers.  •  **Music & Games:** Playlist, games, scores.  •  **Kids:** Activities by age.  •  "
-             "**Decor:** Themes and colours.  •  **Vendors:** Compare vendors, add your own.  •  **Seating:** Who sits where.  •  "
-             "**Live Day:** On the day — check-in, polls, announcements.  •  **Post-Event:** Photos, guestbook, final report.  •  "
-             "**AI Assistant:** Ask a question about your event.  •  **Profile:** Backup and delete your data.  •  "
-             "**Previews:** Mock views of future features, labelled as previews.")
-    with st.expander("How to use this website in 30 seconds (read this first)"):
-        st.write("1. Open the link. No login.\n2. Tap 'See an example first' OR fill the form and click 'Create my full plan'.\n"
-                 "3. Your plan opens on the Plan page — invitation, budget, checklist, schedule, vendors, food, games, all in one place.\n"
-                 "4. Tap a name in the top menu to change that part — e.g. Guests to add people, Budget to add expenses.\n"
-                 "5. When done, go to Post-Event to download your plan (PDF / Markdown / calendar) or share the WhatsApp summary from Plan.")
-    st.subheader("How it works")
-    a, b, c = st.columns(3)
-    with a.container(border=True):
-        st.write("**1. Tell us about your event**")
-        st.write("Guests, budget, date, vibe, and dietary or accessibility needs.")
-    with b.container(border=True):
-        st.write("**2. Get your full plan**")
-        st.write("Budget, checklist, menu, risks, seating, games and music — instantly.")
-    with c.container(border=True):
-        st.write("**3. Run it live**")
-        st.write("Check guests in, track vendors, share updates, then save memories.")
-    st.subheader("What you get")
-    d, e, f, g = st.columns(4)
-    with d.container(border=True):
-        st.write("**Budget, clearly**")
-        st.write("A split that always adds up to your total, plus actual spending.")
-    with e.container(border=True):
-        st.write("**Guests, organised**")
-        st.write("RSVP, dietary needs, seating and check-in in one list.")
-    with f.container(border=True):
-        st.write("**Vendors, compared**")
-        st.write("Prices, status and contacts — no spreadsheets needed.")
-    with g.container(border=True):
-        st.write("**The day itself**")
-        st.write("A run sheet, live polls and announcements for event day.")
-    st.subheader("Start from a template")
-    for t in EVENT_TEMPLATES:
-        if st.button(f"Use template: {t['name']}", key=f"tpl_{t['name']}"):
-            req = EventRequest(t["event_type"], t["guests"], 100000.0,
-                               date.today() + timedelta(days=60), "Toronto", "Fun & Playful",
-                               (), (), False, "", event_name=t["name"], currency="CAD")
-            st.session_state["theme"] = t["theme"]
-            st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
-            st.rerun()
-    st.subheader("Questions, answered")
-    with st.expander("Do I need an account to use this?"):
-        st.write("No. Everything works in your browser session, with no sign-up.")
-    with st.expander("Is my event data private?"):
-        st.write("Yes. It stays in this browser session unless you download it. "
-                 "No event is published by this app.")
-    with st.expander("Do I need an AI key?"):
-        st.write("No. Offline ideas work without a key. A Gemini key only adds "
-                 "extra creative ideas, and is optional.")
-    st.divider()
-    st.caption("Built for Hack2Skill Virtual: PromptWars, Challenge 5 · By Bhavana Shah")
-    st.subheader("My events (this browser session)")
-    if plan is not None and st.button("💾 Save current event"):
-        saved = store("saved_events", [])
-        r = plan.request
-        saved.append({"event_name": r.event_name, "event_type": r.event_type, "guests": r.guests,
-                      "budget": r.budget, "event_date": r.event_date.isoformat(), "city": r.city,
-                      "vibe": r.vibe, "dietary": list(r.dietary), "accessibility": list(r.accessibility),
-                      "outdoor": r.outdoor, "notes": r.notes, "currency": r.currency,
-                      "event_time": r.event_time,
-                      "end_date": r.end_date.isoformat() if r.end_date else "",
-                      "theme": st.session_state.get("theme", "")})
-        st.success("Saved in this session. Download it from Post-Event / Export to keep it.")
-    for i, saved in enumerate(store("saved_events", [])):
-        col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
-        _ed = saved.get("end_date") or ""
-        col1.write(f"**{saved['event_name'] or saved['event_type']}** — {saved['event_type']}, {saved['event_date']}{(' to ' + _ed) if _ed else ''}{', ' + saved['event_time'] if saved.get('event_time') else ''}, {saved['guests']} guests")
-        if col2.button("Load", key=f"load_{i}"):
-            req = EventRequest(saved["event_type"], saved["guests"], saved["budget"],
-                               date.fromisoformat(saved["event_date"]), saved["city"], saved["vibe"],
-                               tuple(saved["dietary"]), tuple(saved["accessibility"]),
-                               saved["outdoor"], saved["notes"], event_name=saved["event_name"],
-                               currency=saved["currency"], event_time=saved.get("event_time", ""),
-                               end_date=date.fromisoformat(saved["end_date"]) if saved.get("end_date") else None)
-            st.session_state["theme"] = saved.get("theme", "")
-            st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
-            st.rerun()
-        if col3.button("Duplicate", key=f"dup_{i}"):
-            copy = dict(saved)
-            copy["event_name"] = (saved["event_name"] or saved["event_type"]) + " (Copy)"
-            store("saved_events", []).append(copy)
-            st.rerun()
-        if col4.button("Delete", key=f"del_{i}"):
-            store("saved_events", []).pop(i)
-            st.rerun()
+        st.subheader("Questions, answered")
+        with st.expander("Do I need an account to use this?"):
+            st.write("No. Everything works in your browser session, with no sign-up.")
+        with st.expander("Is my event data private?"):
+            st.write("Yes. It stays in this browser session unless you download it. "
+                     "No event is published by this app.")
+        with st.expander("Do I need an AI key?"):
+            st.write("No. Offline ideas work without a key. A Gemini key only adds "
+                     "extra creative ideas, and is optional.")
+        st.divider()
+        st.caption("Built for Hack2Skill Virtual: PromptWars, Challenge 5 · By Bhavana Shah")
+        st.subheader("My events (this browser session)")
+        if plan is not None and st.button("💾 Save current event"):
+            saved = store("saved_events", [])
+            r = plan.request
+            saved.append({"event_name": r.event_name, "event_type": r.event_type, "guests": r.guests,
+                          "budget": r.budget, "event_date": r.event_date.isoformat(), "city": r.city,
+                          "vibe": r.vibe, "dietary": list(r.dietary), "accessibility": list(r.accessibility),
+                          "outdoor": r.outdoor, "notes": r.notes, "currency": r.currency,
+                          "event_time": r.event_time,
+                          "end_date": r.end_date.isoformat() if r.end_date else "",
+                          "theme": st.session_state.get("theme", "")})
+            st.success("Saved in this session. Download it from Post-Event / Export to keep it.")
+        for i, saved in enumerate(store("saved_events", [])):
+            col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+            _ed = saved.get("end_date") or ""
+            col1.write(f"**{saved['event_name'] or saved['event_type']}** — {saved['event_type']}, {saved['event_date']}{(' to ' + _ed) if _ed else ''}{', ' + saved['event_time'] if saved.get('event_time') else ''}, {saved['guests']} guests")
+            if col2.button("Load", key=f"load_{i}"):
+                req = EventRequest(saved["event_type"], saved["guests"], saved["budget"],
+                                   date.fromisoformat(saved["event_date"]), saved["city"], saved["vibe"],
+                                   tuple(saved["dietary"]), tuple(saved["accessibility"]),
+                                   saved["outdoor"], saved["notes"], event_name=saved["event_name"],
+                                   currency=saved["currency"], event_time=saved.get("event_time", ""),
+                                   end_date=date.fromisoformat(saved["end_date"]) if saved.get("end_date") else None)
+                st.session_state["theme"] = saved.get("theme", "")
+                st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
+                st.rerun()
+            if col3.button("Duplicate", key=f"dup_{i}"):
+                copy = dict(saved)
+                copy["event_name"] = (saved["event_name"] or saved["event_type"]) + " (Copy)"
+                store("saved_events", []).append(copy)
+                st.rerun()
+            if col4.button("Delete", key=f"del_{i}"):
+                store("saved_events", []).pop(i)
+                st.rerun()
 
 
 def render_plan(plan: Plan) -> None:
@@ -571,127 +515,133 @@ def render_plan(plan: Plan) -> None:
         except Exception:
             pass
     r, b = plan.request, plan.budget
-    cur = r.currency
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Days to go", plan.days_left)
-    c2.metric("Guests", r.guests)
-    c3.metric("Budget per guest", money(b.per_head, cur))
-    c4.metric("Budget level", b.tier)
-    st.info(b.advice)
-    st.subheader("Share your plan summary")
-    _summary = (f"{r.event_name or r.event_type} — {r.event_date.isoformat()}"
-                f"{(' at ' + r.event_time) if r.event_time else ''} in {r.city or 'TBC'}, "
-                f"{r.guests} guests, budget {money(r.budget, r.currency)}. "
-                f"Plan: {'; '.join(t.title for t in plan.timeline[:3])}. "
-                f"Budget split: {', '.join(f'{line.category} {money(line.amount, r.currency)}' for line in b.lines[:3])}…")
-    st.markdown(f"[Share this plan summary on WhatsApp]({whatsapp_link('', _summary)})")
-    st.caption("My own addition: one link that summarises your whole plan for WhatsApp — the app sends nothing itself, you send it from your own WhatsApp.")
-    st.subheader("Your next three actions")
-    for task in plan.timeline[:3]:
-        st.markdown(f"- **{task.title}** ({STATUS_ICON[task.status]}, by {task.due:%d %b %Y})")
-    high = [x for x in plan.risks if x.level == "High"]
-    if high:
-        st.error(f"{len(high)} high-risk item(s) need attention. See Risks in the Plan details below.")
-    st.subheader("Budget at a glance")
-    df = pd.DataFrame([{"Category": line.category, "Share": f"{line.share:.0%}",
-                        "Amount": money(line.amount, cur)} for line in b.lines])
-    st.dataframe(df, hide_index=True, use_container_width=True)
-    st.subheader("Checklist (tick to track)")
-    tdf = pd.DataFrame([{"Done": False, "Due": t.due, "Task": t.title, "Category": t.category,
-                         "Status": STATUS_ICON[t.status]} for t in plan.timeline])
-    edited = st.data_editor(tdf, hide_index=True, use_container_width=True,
-                            disabled=["Due", "Task", "Category", "Status"],
-                            column_config={"Due": st.column_config.DateColumn(format="DD MMM YYYY")},
-                            key=f"tasks_{hash(plan.request)}")
-    done = int(edited["Done"].sum())
-    st.progress(done / len(tdf) if len(tdf) else 0.0, text=f"{done} of {len(tdf)} tasks done")
-    st.subheader("My tasks — add, tick off, delete")
-    st.caption("Your own tasks, in this session, alongside the engine checklist above.")
-    tasks = store("custom_tasks", [])
-    with st.form("add_task", clear_on_submit=True):
-        t1, t2, t3 = st.columns([3, 1, 1])
-        t_title = t1.text_input("Task title *", max_chars=120)
-        t_due = t2.date_input("Due date (optional)", value=None)
-        t_pri = t3.selectbox("Priority", ["High", "Medium", "Low"], index=1)
-        if st.form_submit_button("Add task"):
-            if t_title.strip():
-                tasks.append({"title": t_title.strip(), "due": t_due.isoformat() if t_due else "", "done": False, "priority": t_pri})
-                st.success(f"Added: {t_title.strip()}")
-    for i, t in enumerate(list(tasks)):
-        c1, c2, c3 = st.columns([1, 5, 1])
-        if c1.checkbox("", value=t["done"], key=f"task_done_{i}"):
-            tasks[i]["done"] = True
-        else:
-            tasks[i]["done"] = False
-        c2.write(f"{t['title']} [{t.get('priority', 'Medium')}]{' — due ' + t['due'] if t.get('due') else ''}")
-        if c3.button("Delete", key=f"task_del_{i}"):
-            tasks.pop(i)
-            st.rerun()
-    if tasks:
-        st.write(f"{sum(1 for t in tasks if t['done'])} of {len(tasks)} of my tasks done.")
-    st.subheader("Risks")
-    if not plan.risks:
-        st.success("No major risks detected.")
-    for risk in plan.risks:
-        box = {"High": st.error, "Medium": st.warning, "Info": st.info}[risk.level]
-        box(f"**{RISK_LABEL[risk.level]}:** {risk.message}")
-    st.subheader("Logistics & menu")
-    lg = plan.logistics
-    cols = st.columns(5)
-    items = [("Venue capacity", lg.venue_capacity), ("Area (sq ft)", lg.venue_area_sqft),
-             ("Food portions", lg.food_portions), ("Drinks", lg.drink_units),
-             ("Cake servings", lg.cake_servings), ("Chairs", lg.chairs),
-             ("Tables of 8", lg.tables), ("Service staff", lg.service_staff),
-             ("Restrooms", lg.restrooms), ("Parking spots", lg.parking_spots)]
-    for i, (label, value) in enumerate(items):
-        cols[i % 5].metric(label, value)
-    for course, dishes in plan.menu.items():
-        st.markdown(f"**{course}:** " + "; ".join(dishes))
-    st.caption("Always confirm allergens with your caterer.")
-    if plan.request.event_type == "Wedding":
-        st.subheader("Wedding planner — ceremony, reception, outfits, rings, honeymoon fund")
-        st.caption("Wedding-only checklist (Zola-style, but free and without a real gift shop): tick what is done, in this session.")
-        for item in ["Ceremony venue + officiant confirmed", "Reception venue + menu confirmed",
-                     "Bridal + groom outfits + fittings scheduled", "Rings ordered",
-                     "Photographer + videographer shot list shared", "Honeymoon fund / gift registry items listed (tracker only, no purchase here)",
-                     "Guest transport + accommodation coordinated", "Rehearsal dinner planned"]:
-            st.checkbox(item, key=f"wedding_{item}")
-    st.subheader("Full plan at a glance — invitation, schedule, vendors, shopping, games, music")
-    st.caption("Everything from your details, on one page — so you do not have to open every section to see the plan.")
-    st.markdown("**Invitation (ready to copy)**")
-    st.text_area("Your invitation", invitation_text(plan.request, st.session_state.get("theme", "")), height=150, key="fullplan_invite")
-    _theme = st.session_state.get("theme", "Space")
-    _pal = THEMES.get(_theme, {"colors": ["#C026D3", "#FDF2F8", "#FFFFFF", "#1B2A4E"]})["colors"]
-    _ev_name = plan.request.event_name or f"{plan.request.event_type} Celebration"
-    st.markdown(f"""<div style="background:{_pal[1]};border:3px solid {_pal[0]};border-radius:16px;padding:24px;text-align:center">
-<h2 style="color:{_pal[0]};margin:0">🎉 {_ev_name} 🎉</h2>
-<p style="font-size:18px;margin:8px 0">{plan.request.event_type} • {plan.request.event_date.isoformat()}{(' • ' + plan.request.event_time) if plan.request.event_time else ''}</p>
-<p style="margin:4px 0">{plan.request.city or 'Venue to be confirmed'} • {plan.request.guests} guests • Theme: {_theme}</p>
-<p style="margin:4px 0">You are invited! Please RSVP so we can plan food, seating and return gifts for everyone.</p>
-</div>""", unsafe_allow_html=True)
-    st.caption("Stylish invitation preview — design only. Share it via WhatsApp / email links in Guests & Invites; this app sends no message itself.")
-    st.markdown("**Day schedule**")
-    for title, detail in day_schedule(plan.request.event_type):
-        st.write(f"- **{title}:** {detail}")
-    st.markdown("**Vendors to book**")
-    for vendor in vendor_checklist(plan.request.event_type):
-        st.write(f"- {vendor}")
-    st.markdown("**Shopping / item list (scaled by guests)**")
-    for item in item_list(plan.request.guests):
-        st.write(f"- {item}")
-    st.markdown("**Games for this event**")
-    for name, duration, detail in games_for(plan.request.event_type):
-        st.write(f"- **{name}** ({duration}) — {detail}")
-    st.markdown("**Music by moment**")
-    for moment, note in music_by_moment():
-        st.write(f"- **{moment}:** {note}")
-    st.subheader("Notes & reminders")
-    st.text_area("Your notes for this event", key="plan_notes", height=120,
-                 help="Stored only in this browser session.")
-    if st.button("Add a reminder"):
-        st.session_state.setdefault("reminders", []).append("Reminder added — check this list before event day.")
-    for rem in st.session_state.get("reminders", []):
-        st.write(f"- {rem}")
+    tab_overview, tab_budget, tab_invite, tab_tasks = st.tabs(["Overview", "Budget & Checklist", "Invitation & Day Plan", "My tasks & Notes"])
+    with tab_overview:
+        cur = r.currency
+        c1, c2 = st.columns(2)
+        c1.metric("Days to go", plan.days_left)
+        c2.metric("Guests", r.guests)
+        c3, c4 = st.columns(2)
+        c3.metric("Budget per guest", money(b.per_head, cur))
+        c4.metric("Budget level", b.tier)
+        st.info(b.advice)
+        st.subheader("Share your plan summary")
+        _summary = (f"{r.event_name or r.event_type} — {r.event_date.isoformat()}"
+                    f"{(' at ' + r.event_time) if r.event_time else ''} in {r.city or 'TBC'}, "
+                    f"{r.guests} guests, budget {money(r.budget, r.currency)}. "
+                    f"Plan: {'; '.join(t.title for t in plan.timeline[:3])}. "
+                    f"Budget split: {', '.join(f'{line.category} {money(line.amount, r.currency)}' for line in b.lines[:3])}…")
+        st.markdown(f"[Share this plan summary on WhatsApp]({whatsapp_link('', _summary)})")
+        st.caption("My own addition: one link that summarises your whole plan for WhatsApp — the app sends nothing itself, you send it from your own WhatsApp.")
+        st.subheader("Your next three actions")
+        for task in plan.timeline[:3]:
+            st.markdown(f"- **{task.title}** ({STATUS_ICON[task.status]}, by {task.due:%d %b %Y})")
+        high = [x for x in plan.risks if x.level == "High"]
+        if high:
+            st.error(f"{len(high)} high-risk item(s) need attention. See Risks in the Plan details below.")
+    with tab_budget:
+        st.subheader("Budget at a glance")
+        df = pd.DataFrame([{"Category": line.category, "Share": f"{line.share:.0%}",
+                            "Amount": money(line.amount, cur)} for line in b.lines])
+        st.dataframe(df, hide_index=True, use_container_width=True)
+        st.subheader("Checklist (tick to track)")
+        tdf = pd.DataFrame([{"Done": False, "Due": t.due, "Task": t.title, "Category": t.category,
+                             "Status": STATUS_ICON[t.status]} for t in plan.timeline])
+        edited = st.data_editor(tdf, hide_index=True, use_container_width=True,
+                                disabled=["Due", "Task", "Category", "Status"],
+                                column_config={"Due": st.column_config.DateColumn(format="DD MMM YYYY")},
+                                key=f"tasks_{hash(plan.request)}")
+        done = int(edited["Done"].sum())
+        st.progress(done / len(tdf) if len(tdf) else 0.0, text=f"{done} of {len(tdf)} tasks done")
+        st.subheader("Risks")
+        if not plan.risks:
+            st.success("No major risks detected.")
+        for risk in plan.risks:
+            box = {"High": st.error, "Medium": st.warning, "Info": st.info}[risk.level]
+            box(f"**{RISK_LABEL[risk.level]}:** {risk.message}")
+        st.subheader("Logistics & menu")
+        lg = plan.logistics
+        cols = st.columns(3)
+        items = [("Venue capacity", lg.venue_capacity), ("Area (sq ft)", lg.venue_area_sqft),
+                 ("Food portions", lg.food_portions), ("Drinks", lg.drink_units),
+                 ("Cake servings", lg.cake_servings), ("Chairs", lg.chairs),
+                 ("Tables of 8", lg.tables), ("Service staff", lg.service_staff),
+                 ("Restrooms", lg.restrooms), ("Parking spots", lg.parking_spots)]
+        for i, (label, value) in enumerate(items):
+            cols[i % 3].metric(label, value)
+        for course, dishes in plan.menu.items():
+            st.markdown(f"**{course}:** " + "; ".join(dishes))
+        st.caption("Always confirm allergens with your caterer.")
+        if plan.request.event_type == "Wedding":
+            st.subheader("Wedding planner — ceremony, reception, outfits, rings, honeymoon fund")
+            st.caption("Wedding-only checklist (Zola-style, but free and without a real gift shop): tick what is done, in this session.")
+            for item in ["Ceremony venue + officiant confirmed", "Reception venue + menu confirmed",
+                         "Bridal + groom outfits + fittings scheduled", "Rings ordered",
+                         "Photographer + videographer shot list shared", "Honeymoon fund / gift registry items listed (tracker only, no purchase here)",
+                         "Guest transport + accommodation coordinated", "Rehearsal dinner planned"]:
+                st.checkbox(item, key=f"wedding_{item}")
+    with tab_invite:
+        st.subheader("Full plan at a glance — invitation, schedule, vendors, shopping, games, music")
+        st.caption("Everything from your details, on one page — so you do not have to open every section to see the plan.")
+        st.markdown("**Invitation (ready to copy)**")
+        st.text_area("Your invitation", invitation_text(plan.request, st.session_state.get("theme", "")), height=150, key="fullplan_invite")
+        _theme = st.session_state.get("theme", "Space")
+        _pal = THEMES.get(_theme, {"colors": ["#C026D3", "#FDF2F8", "#FFFFFF", "#1B2A4E"]})["colors"]
+        _ev_name = plan.request.event_name or f"{plan.request.event_type} Celebration"
+        st.markdown(f"""<div style="background:{_pal[1]};border:3px solid {_pal[0]};border-radius:16px;padding:24px;text-align:center">
+    <h2 style="color:{_pal[0]};margin:0">🎉 {_ev_name} 🎉</h2>
+    <p style="font-size:18px;margin:8px 0">{plan.request.event_type} • {plan.request.event_date.isoformat()}{(' • ' + plan.request.event_time) if plan.request.event_time else ''}</p>
+    <p style="margin:4px 0">{plan.request.city or 'Venue to be confirmed'} • {plan.request.guests} guests • Theme: {_theme}</p>
+    <p style="margin:4px 0">You are invited! Please RSVP so we can plan food, seating and return gifts for everyone.</p>
+    </div>""", unsafe_allow_html=True)
+        st.caption("Stylish invitation preview — design only. Share it via WhatsApp / email links in Guests & Invites; this app sends no message itself.")
+        st.markdown("**Day schedule**")
+        for title, detail in day_schedule(plan.request.event_type):
+            st.write(f"- **{title}:** {detail}")
+        st.markdown("**Vendors to book**")
+        for vendor in vendor_checklist(plan.request.event_type):
+            st.write(f"- {vendor}")
+        st.markdown("**Shopping / item list (scaled by guests)**")
+        for item in item_list(plan.request.guests):
+            st.write(f"- {item}")
+        st.markdown("**Games for this event**")
+        for name, duration, detail in games_for(plan.request.event_type):
+            st.write(f"- **{name}** ({duration}) — {detail}")
+        st.markdown("**Music by moment**")
+        for moment, note in music_by_moment():
+            st.write(f"- **{moment}:** {note}")
+    with tab_tasks:
+        st.subheader("My tasks — add, tick off, delete")
+        st.caption("Your own tasks, in this session, alongside the engine checklist above.")
+        tasks = store("custom_tasks", [])
+        with st.form("add_task", clear_on_submit=True):
+            t1, t2, t3 = st.columns([3, 1, 1])
+            t_title = t1.text_input("Task title *", max_chars=120)
+            t_due = t2.date_input("Due date (optional)", value=None)
+            t_pri = t3.selectbox("Priority", ["High", "Medium", "Low"], index=1)
+            if st.form_submit_button("Add task"):
+                if t_title.strip():
+                    tasks.append({"title": t_title.strip(), "due": t_due.isoformat() if t_due else "", "done": False, "priority": t_pri})
+                    st.success(f"Added: {t_title.strip()}")
+        for i, t in enumerate(list(tasks)):
+            c1, c2, c3 = st.columns([1, 5, 1])
+            if c1.checkbox("", value=t["done"], key=f"task_done_{i}"):
+                tasks[i]["done"] = True
+            else:
+                tasks[i]["done"] = False
+            c2.write(f"{t['title']} [{t.get('priority', 'Medium')}]{' — due ' + t['due'] if t.get('due') else ''}")
+            if c3.button("Delete", key=f"task_del_{i}"):
+                tasks.pop(i)
+                st.rerun()
+        if tasks:
+            st.write(f"{sum(1 for t in tasks if t['done'])} of {len(tasks)} of my tasks done.")
+        st.subheader("Notes & reminders")
+        st.text_area("Your notes for this event", key="plan_notes", height=120,
+                     help="Stored only in this browser session.")
+        if st.button("Add a reminder"):
+            st.session_state.setdefault("reminders", []).append("Reminder added — check this list before event day.")
+        for rem in st.session_state.get("reminders", []):
+            st.write(f"- {rem}")
 
 
 def render_guests(plan: Plan) -> None:
