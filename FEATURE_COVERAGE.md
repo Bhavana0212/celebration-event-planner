@@ -136,3 +136,18 @@ evaluators, so they are listed honestly as the next phase instead.
   honestly deliver them, and adding fake buttons for them would mislead
   users. Market launch as a free, no-account, single-session planner is
   real today; the super-platform version is a rebuild, not a patch.
+
+## Mock previews batch (2026-10-27)
+- New 15th section "Previews (Mock)", works without a plan, from Home quick-access too.
+- 7 previews, every one labelled MOCK PREVIEW: Login/Account, Checkout & Payments,
+  Vendor Booking, 3D Floor Plan (labelled illustration, not interactive 3D),
+  Live Multi-user Collaboration, Email/SMS Notifications, Admin Dashboard.
+- Safety: no password input and no card-number input anywhere in previews;
+  action buttons are disabled; sample names/prices/stats only; nothing is
+  created, booked, charged, sent or saved to a server. Real features will
+  replace each preview in the free-backend version.
+- Tests: 172 pass (169 + 3 new preview tests); AppTest navigation to
+  Previews verified with no exception.
+- NOT yet on GitHub/live at commit time: the previous market-batch web upload
+  was still running, so this mock batch is committed locally and will be
+  uploaded after that upload finishes, to avoid conflicting web edits.
