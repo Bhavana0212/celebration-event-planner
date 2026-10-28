@@ -326,3 +326,6 @@ evaluators, so they are listed honestly as the next phase instead.
 
 ## 2026-10-28 — Popping colours batch (user feedback: colours should pop more)
 - Vivid popping palette: primary #E91E8C (bright pink), gradient buttons pink → orange #FF7A00, gold accent #FFB800, bright pink-tinted background #FFF5F9, sidebar #FFE4F1. No extra cost, theme files only.
+
+## 2026-10-28 — Footer fix (live check found footer missing)
+- render_footer() was defined but never called in main() — fixed: it now runs at the end of every page (Home, Plan, info pages, all sections). AppTest confirms the pro-footer block renders.
