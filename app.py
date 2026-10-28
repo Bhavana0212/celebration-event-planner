@@ -154,6 +154,76 @@ def sidebar_plan_form() -> EventRequest | None:
                         end_date=end_date)
 
 
+
+# --- Step-by-step journey: start to end, in order -------------------------
+# The user asked for this explicitly: celebration first, then guest list,
+# budget, invitation, decor, food, music, vendors, seating, kids/return
+# gifts, live day, and finally thank-you/memories — one by one, so that
+# when the last step is done, the whole event is set. A step is marked
+# Done ONLY from real session data (see below); nothing is faked.
+JOURNEY_STEPS = [
+    ("1. Celebration planning", "Plan", "Event details, date, theme, full plan, checklist"),
+    ("2. Guest list", "Guests & Invites", "Add every guest, with RSVP, dietary and plus-ones"),
+    ("3. Budget", "Budget & Expenses", "Add your actual expenses, see what is left"),
+    ("4. Invitation", "Guests & Invites", "Invitation is generated with your plan — edit, copy, share it"),
+    ("5. Decor", "Decor & Design", "Theme, colours, mood board, decoration shopping list"),
+    ("6. Food & Cake", "Food & Cake", "Menu for each course, cake size, leftovers"),
+    ("7. Music & Games", "Music & Games", "Playlist, song requests, games, scores"),
+    ("8. Vendors & Shopping", "Vendors & Shopping", "Add your real vendors, shopping cart estimates"),
+    ("9. Seating", "Seating & Floor Plan", "Who sits at which table, 2D floor plan"),
+    ("10. Kids & Return gifts", "Kids", "Kids activities, goodie bag items, safety checklist"),
+    ("11. Live Event Day", "Live Event Day", "Run sheet, check-in, announcements, polls"),
+    ("12. Thank you & Memories", "Post-Event & Memories", "Photos, guestbook, thank-you, final report"),
+]
+
+def journey_done_flags() -> list[bool]:
+    s = st.session_state
+    plan = s.get("plan") is not None
+    menu_done = any(str(s.get(k, "")).strip() for k in s.keys() if str(k).startswith("menu_")) or bool(s.get("leftovers"))
+    music_done = bool(s.get("playlist") or s.get("song_requests") or s.get("game_scores") or s.get("quiz") or s.get("clues"))
+    return [
+        plan,
+        bool(s.get("real_guests")),
+        bool(s.get("expenses")),
+        plan,
+        bool(s.get("decor_shopping") or str(s.get("mood_notes", "")).strip()),
+        menu_done,
+        music_done,
+        bool(s.get("custom_vendors") or s.get("cart")),
+        bool(s.get("seating")),
+        s.get("goodie_items") is not None,
+        bool(s.get("announcements") or s.get("poll") or s.get("incidents")),
+        bool(s.get("guestbook") or s.get("photos") or s.get("gifts")),
+    ]
+
+def render_journey() -> None:
+    st.subheader("Complete journey — start to end, step by step")
+    st.write("Follow these steps in order, one by one. When the last step is done, your whole event is set — nothing left hanging.")
+    flags = journey_done_flags()
+    done = sum(flags)
+    st.progress(done / len(JOURNEY_STEPS))
+    if done == len(JOURNEY_STEPS):
+        st.success("🎉 All steps done — your event is fully set! Now enjoy the celebration.")
+    else:
+        nxt = next(i for i, f in enumerate(flags) if not f)
+        st.write(f"**Your progress: {done} of {len(JOURNEY_STEPS)} steps done. Next step: {JOURNEY_STEPS[nxt][0]}**")
+    plan = st.session_state.get("plan")
+    next_idx = next((j for j, f in enumerate(flags) if not f), -1)
+    for i, ((title, target, what), is_done) in enumerate(zip(JOURNEY_STEPS, flags)):
+        status = "✅ Done" if is_done else ("➡️ Next" if i == next_idx else "⏳ Pending")
+        c1, c2, c3 = st.columns([3, 1, 1])
+        c1.write(f"**{title}** — {what}")
+        c2.write(status)
+        if plan is not None:
+            if c3.button("Open →", key=f"journey_{i}"):
+                st.session_state["pending_section"] = target
+                st.rerun()
+        else:
+            c3.write("Create plan first" if i > 0 else "Form below ↓")
+    st.caption("Honest rule: a step turns ✅ Done only when you actually do it in that section (add a guest, add an expense, add a vendor, and so on). "
+               "Steps 1 and 4 are ready with your plan itself, because the plan generates the checklist and the invitation.")
+
+
 def render_home(plan: Plan | None) -> None:
     # Professional landing: one clear headline, one clear action, then
     # services as clean cards — the pattern used by professional event
@@ -180,6 +250,7 @@ def render_home(plan: Plan | None) -> None:
         st.session_state.pop("ai_text", None)
         st.session_state["pending_section"] = "Plan"
         st.rerun()
+    render_journey()
     st.subheader("Step 1 — Create your plan here (no sidebar needed)")
     st.caption("Only 5 things are needed: event name, type, guests, budget, date. Everything else below is optional — skip it if you want.")
     st.caption("Fill this form and click 'Create my full plan'. Your complete plan — "
