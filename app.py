@@ -36,6 +36,7 @@ import csv
 import io
 import json
 import os
+import pathlib
 import random
 from datetime import date, timedelta
 
@@ -61,6 +62,18 @@ st.set_page_config(
     layout="wide",
     menu_items={"About": "Celebration & Event Planner — plan weddings, birthdays and community events, start to finish."},
 )
+
+def load_professional_theme() -> None:
+    """Inject the professional theme CSS (assets/professional-theme.css).
+
+    Theme lives in its own file, not mixed into app logic — that is the
+    well-architected split: planner/ = engine, app.py = screens,
+    assets/professional-theme.css = look. If the file is missing (e.g.
+    a partial upload), the app still works with Streamlit's default look.
+    """
+    css_path = pathlib.Path(__file__).resolve().parent / "assets" / "professional-theme.css"
+    if css_path.exists():
+        st.markdown(f"<style>{css_path.read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
 
 RISK_LABEL = {"High": "🔴 High risk", "Medium": "🟠 Medium risk", "Info": "🔵 Tip"}
 STATUS_ICON = {"Do now": "⚠️ Do now", "Scheduled": "🗓️ Scheduled", "After event": "💌 After event"}
@@ -1293,6 +1306,9 @@ def render_previews() -> None:
 
 
 def main() -> None:
+    load_professional_theme()
+    st.markdown('<div class="pro-header"><div class="pro-brand">🎉 Celebration &amp; Event Planner</div>'
+                '<div class="pro-tag">Free · No account · Every event, one plan</div></div>', unsafe_allow_html=True)
     request = sidebar_plan_form()
     if request is not None:
         try:
