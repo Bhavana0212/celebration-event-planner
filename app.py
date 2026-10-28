@@ -86,7 +86,8 @@ SECTIONS = ["Home", "Plan", "Guests & Invites", "Budget & Expenses",
             "Food & Cake", "Music & Games", "Kids", "Decor & Design",
             "Vendors & Shopping", "Seating & Floor Plan", "Live Event Day",
             "Post-Event & Memories", "AI Assistant", "Profile & Settings",
-            "Previews (Mock)"]
+            "Previews (Mock)", "About", "Services", "Pricing", "FAQ",
+            "Reviews", "Contact", "Privacy & Terms"]
 
 
 @st.cache_data(show_spinner=False, max_entries=64)
@@ -189,22 +190,40 @@ def render_journey() -> None:
     else:
         nxt = next(i for i, f in enumerate(flags) if not f)
         st.write(f"**Your progress: {done} of {len(JOURNEY_STEPS)} steps done. Next step: {JOURNEY_STEPS[nxt][0]}**")
+    # Horizontal process graph: Step 1 → Step 2 → … (wraps on mobile),
+    # done = ✓ magenta, current = gold ring, upcoming = grey. No table,
+    # no "Pending" column — the graph itself shows where you are.
     plan = st.session_state.get("plan")
     next_idx = next((j for j, f in enumerate(flags) if not f), -1)
-    for i, ((title, target, what), is_done) in enumerate(zip(JOURNEY_STEPS, flags)):
-        status = "✅ Done" if is_done else ("➡️ Next" if i == next_idx else "⏳ Pending")
-        c1, c2, c3 = st.columns([3, 1, 1])
-        c1.write(f"**{title}** — {what}")
-        c2.write(status)
-        if plan is not None:
-            if c3.button("Open →", key=f"journey_{i}"):
-                st.session_state["pending_section"] = target
-                st.rerun()
-        else:
-            c3.write("Create plan first" if i > 0 else "Form below ↓")
-    st.caption("Honest rule: a step turns ✅ Done only when you actually do it in that section (add a guest, add an expense, add a vendor, and so on). "
+    cards = []
+    for i, ((title, _target, _what), is_done) in enumerate(zip(JOURNEY_STEPS, flags)):
+        cls = "done" if is_done else ("current" if i == next_idx else "upcoming")
+        mark = "✓" if is_done else ("▶" if i == next_idx else str(i + 1))
+        cards.append(f'<div class="step {cls}"><span class="step-mark">{mark}</span><span class="step-title">{title}</span></div>')
+    stepper = '<div class="stepper">' + '<span class="step-arrow">→</span>'.join(cards) + "</div>"
+    st.markdown(stepper, unsafe_allow_html=True)
+    st.caption("✓ = done in that section  •  ▶ = your next step  •  numbered = coming up. "
+               "A step turns ✓ only when you actually do it (add a guest, add an expense, add a vendor, and so on). "
                "Steps 1 and 4 are ready with your plan itself, because the plan generates the checklist and the invitation.")
-
+    # Step cards in a 3-column grid — tap a step to open its page.
+    for row in range(0, len(JOURNEY_STEPS), 3):
+        cols = st.columns(3)
+        for col, i in zip(cols, range(row, min(row + 3, len(JOURNEY_STEPS)))):
+            (title, target, what), is_done = JOURNEY_STEPS[i], flags[i]
+            with col.container(border=True):
+                st.write(f"**{i + 1}. {title}**")
+                st.write(what)
+                st.write("✓ Done" if is_done else ("▶ Next step" if i == next_idx else "○ Coming up"))
+                if plan is not None:
+                    if st.button("Open →", key=f"journey_{i}"):
+                        st.session_state["pending_section"] = target
+                        st.rerun()
+                elif i == 0:
+                    if st.button("Start here →", key="journey_start"):
+                        st.session_state["pending_section"] = "Home"
+                        st.rerun()
+                else:
+                    st.write("○ After your plan")
 
 
 # --- Premium polish: 7-step event creation wizard + dashboard -------------
@@ -355,7 +374,8 @@ def render_home(plan: Plan | None) -> None:
         st.session_state.pop("ai_text", None)
         st.session_state["pending_section"] = "Plan"
         st.rerun()
-    render_journey()
+    # Form first, journey second: nobody should scroll to the bottom of
+    # the page to fill a form. Content lives between header and footer.
     if plan is not None:
         render_dashboard(plan)
         with st.expander("Create a different event — 7-step wizard"):
@@ -368,6 +388,7 @@ def render_home(plan: Plan | None) -> None:
             if col.button(occasion, key=f"explore_{occasion}"):
                 d = wizard_data(); d["type"] = occasion; st.session_state["wizard_step"] = 1; st.rerun()
         render_event_wizard()
+    render_journey()
     if plan is not None:
         if st.button("See my full plan →", type="primary", key="see_full_plan"):
             st.session_state["pending_section"] = "Plan"
@@ -459,15 +480,7 @@ def render_home(plan: Plan | None) -> None:
                 st.session_state["theme"] = t["theme"]
                 st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
                 st.rerun()
-        st.subheader("Questions, answered")
-        with st.expander("Do I need an account to use this?"):
-            st.write("No. Everything works in your browser session, with no sign-up.")
-        with st.expander("Is my event data private?"):
-            st.write("Yes. It stays in this browser session unless you download it. "
-                     "No event is published by this app.")
-        with st.expander("Do I need an AI key?"):
-            st.write("No. Offline ideas work without a key. A Gemini key only adds "
-                     "extra creative ideas, and is optional.")
+        st.caption("Full FAQ lives on its own page — pick FAQ in the top menu.")
         st.divider()
         st.caption("Built for Hack2Skill Virtual: PromptWars, Challenge 5 · By Bhavana Shah")
         st.subheader("My events (this browser session)")
@@ -1422,11 +1435,11 @@ def main() -> None:
     # the radio widget is created, otherwise Streamlit rejects the change.
     if st.session_state.get("pending_section"):
         st.session_state["nav_section"] = st.session_state.pop("pending_section")
-    # TOP navigation bar: a horizontal menu at the top of the page, so a
-    # person can pick any section as they like — no sidebar hamburger hunt,
-    # especially on mobile. The sidebar still holds the (optional) plan form.
-    st.caption("Choose a section below — tap any name, it opens at once.")
-    section = st.radio("Choose a section", SECTIONS, horizontal=True, key="nav_section")
+    # TOP navigation bar: one dropdown menu at the top of the page, so a
+    # person can pick any page as they like — no sidebar hamburger hunt,
+    # and no 20 radio buttons wrapping on mobile.
+    section = st.selectbox("Navigate to a page", SECTIONS, key="nav_section",
+                           help="One menu for every page — planner sections and info pages (About, Services, Pricing, FAQ, Reviews, Contact, Privacy & Terms).")
     with st.sidebar:
         st.divider()
         st.caption("Celebration & Event Planner · Hack2Skill Challenge 5")
@@ -1434,6 +1447,20 @@ def main() -> None:
         render_home(plan)
     elif section == "Previews (Mock)":
         render_previews()
+    elif section == "About":
+        render_about()
+    elif section == "Services":
+        render_services()
+    elif section == "Pricing":
+        render_pricing()
+    elif section == "FAQ":
+        render_faq()
+    elif section == "Reviews":
+        render_reviews()
+    elif section == "Contact":
+        render_contact()
+    elif section == "Privacy & Terms":
+        render_privacy_terms()
     elif plan is None:
         st.info("First step: create a plan on Home below — fill the short form at the top, or tap 'See an example first' (1 tap). Then this section will open with your plan.")
         render_home(None)
@@ -1465,6 +1492,118 @@ def main() -> None:
         render_profile(plan)
     elif section == "Previews (Mock)":
         render_previews()
+
+
+# --- Info pages: About, Services, Pricing, FAQ, Reviews, Contact, Privacy ---
+def render_footer() -> None:
+    st.divider()
+    st.markdown("""<div class="pro-footer"><div><strong>🎉 Celebration &amp; Event Planner</strong> · By Bhavana Shah · Hack2Skill Challenge 5</div>
+<div>Pages: Home · About · Services · Pricing · FAQ · Reviews · Contact · Privacy &amp; Terms</div>
+<div>Free · No account · No real payments or bookings — mocks are labelled MOCK PREVIEW ONLY.</div></div>""", unsafe_allow_html=True)
+
+def render_about() -> None:
+    st.title("About us")
+    st.write("Celebration & Event Planner is a free, no-account planner built for Hack2Skill Virtual: PromptWars, Challenge 5, by Bhavana Shah. "
+             "It helps you plan weddings, birthdays, festivals and community events in one place: a full plan, budget, guests, vendors, food, games, seating and memories.")
+    st.write(f"It covers {len(EVENT_TYPES)} event types, {len(EVENT_TEMPLATES)}+ templates, and a 12-step journey from celebration planning to thank-you and memories. "
+             "Everything works in your browser session — no sign-up, no payment, nothing installed.")
+    st.subheader("What it is — and what it is not")
+    st.write("**It is:** a working planner with a real budget engine, checklist, menu, risks, logistics and exports (Markdown, calendar, CSV, JSON, PDF).")
+    st.write("**It is not:** a booking site. It does not book vendors, charge payments, send invitations or publish your event. "
+             "Vendor booking, checkout, login and admin views are labelled MOCK PREVIEW ONLY in Previews (Mock), and are the next phase — they are not faked as real here.")
+
+def render_services() -> None:
+    st.title("Services — everything in one planner")
+    st.write("Tap a service to open its page. Every service works on the same plan you create on Home.")
+    services = [("Celebration planning", "Plan", "Full plan, checklist, risks, logistics — from your event details."),
+                ("Guest list & invitations", "Guests & Invites", "Add guests, RSVP, dietary, seating notes, invitation and WhatsApp summary."),
+                ("Budget & expenses", "Budget & Expenses", "A split that adds up to your total, plus actual spending vs planned."),
+                ("Food & cake", "Food & Cake", "Menu for each course, cake size, leftovers tracker."),
+                ("Music & games", "Music & Games", "Playlist, song requests, games, quiz, scores and leaderboard."),
+                ("Kids & return gifts", "Kids", "Age-wise activities, goodie bags, safety checklist."),
+                ("Decor & design", "Decor & Design", "Themes, colours, mood board, decoration shopping list."),
+                ("Vendors & shopping", "Vendors & Shopping", "Sample vendors, your own vendors, shopping cart estimates."),
+                ("Seating & floor plan", "Seating & Floor Plan", "Who sits at which table, 2D floor-plan schematic."),
+                ("Live event day", "Live Event Day", "Run sheet, check-in, polls, announcements, incidents."),
+                ("Post-event & memories", "Post-Event & Memories", "Photos, guestbook, gifts, final report and exports."),
+                ("AI assistant", "AI Assistant", "Creative ideas and budget tips for your event (optional Gemini key; offline ideas work without one).")]
+    for row in range(0, len(services), 3):
+        cols = st.columns(3)
+        for col, (name, target, desc) in zip(cols, services[row:row + 3]):
+            with col.container(border=True):
+                st.write(f"**{name}**")
+                st.write(desc)
+                if st.button(f"Open {name} →", key=f"svc_{name}"):
+                    st.session_state["pending_section"] = target
+                    st.rerun()
+
+def render_pricing() -> None:
+    st.title("Pricing — free, plain and simple")
+    c1, c2 = st.columns(2)
+    with c1.container(border=True):
+        st.write("**Free plan — everything here, today**")
+        st.write("₹0 / $0 / C$0 — no card, no account, no trial timer.")
+        st.write("Full plan, budget, guests, vendors, food, games, seating, live day, memories and exports — all included.")
+        if st.button("Start free — create your plan →", key="pricing_start"):
+            st.session_state["pending_section"] = "Home"
+            st.rerun()
+    with c2.container(border=True):
+        st.write("**Future ideas — NOT available yet**")
+        st.write("Real vendor booking, real payments, a real gift shop and live multi-user sync are the next phase. "
+                 "No price is promised for them here, because they do not exist yet — and they will never be faked as live features.")
+
+def render_faq() -> None:
+    st.title("FAQ — frequently asked questions")
+    faqs = [("Do I need an account to use this?", "No. Everything works in your browser session, with no sign-up."),
+            ("Is my event data private?", "Yes. It stays in this browser session unless you download it. No event is published by this app."),
+            ("Do I need an AI key?", "No. Offline ideas work without a key. A Gemini key only adds extra creative ideas, and is optional."),
+            ("Does it book vendors or take payments?", "No. Those are labelled mock previews only, in Previews (Mock). Real booking and payments are the next phase."),
+            ("Can I use it for a wedding?", "Yes — there is a wedding-only checklist on the Plan page, plus 18 event types including Engagement, Retirement and Family Reunion."),
+            ("How do I keep my plan?", "Go to Post-Event & Memories and download it (Markdown, calendar, CSV, JSON or PDF), or save it in this session from Home."),
+            ("Why is there no login?", "Because this phase is a free, no-account planner. Login, email verification and admin are future work, shown only as labelled mocks.")]
+    for q, a in faqs:
+        with st.expander(q):
+            st.write(a)
+
+def render_reviews() -> None:
+    st.title("Reviews — honest, no fake testimonials")
+    st.write("This planner is new, so there are **no verified customer reviews yet**. Any review below is one you add in this browser session only — "
+             "it is not published, not verified, and disappears when the session ends. Real reviews will only appear here when real users give them.")
+    reviews = store("session_reviews", [])
+    with st.form("add_review", clear_on_submit=True):
+        name = st.text_input("Your name (optional)", max_chars=80)
+        rating = st.selectbox("Rating", ["★★★★★", "★★★★", "★★★", "★★", "★"])
+        text = st.text_area("Your review", max_chars=500)
+        if st.form_submit_button("Add my session review"):
+            if text.strip():
+                reviews.append({"name": name.strip() or "Anonymous", "rating": rating, "text": text.strip()})
+                st.success("Added in this session only — not published.")
+    for r in reviews:
+        with st.container(border=True):
+            st.write(f"**{r['name']}** — {r['rating']}")
+            st.write(r["text"])
+
+def render_contact() -> None:
+    st.title("Contact us")
+    st.write("This is a Hack2Skill Challenge 5 project by **Bhavana Shah**. There is no support desk and no email backend yet — "
+             "so nothing on this page is sent to a server. Use the links below, which open in your own apps.")
+    st.markdown("[Open the GitHub project](https://github.com/Bhavana0212/celebration-event-planner)")
+    st.markdown("[Open the live planner](https://sufuuqiqx6n4vnqrsufv6q.streamlit.app/)")
+    st.subheader("Send a message via WhatsApp (you send it, the app sends nothing)")
+    msg = st.text_area("Your message", "Hi! I tried the Celebration & Event Planner and wanted to share feedback.", max_chars=500, key="contact_msg")
+    st.markdown(f"[Send this message on WhatsApp]({whatsapp_link('', msg)})")
+    st.caption("The link opens WhatsApp on your device with your message ready — you choose whether to send it.")
+
+def render_privacy_terms() -> None:
+    st.title("Privacy Policy & Terms")
+    st.subheader("Privacy Policy")
+    st.write("**What is stored:** nothing on a server. Your plan, guests, expenses and notes live only in your browser session, unless you download them yourself.")
+    st.write("**Accounts:** there are none — no sign-up, no password, no email verification in this phase.")
+    st.write("**AI:** if a Gemini key is set in Streamlit Secrets, only validated plan context is sent for creative ideas, and your notes are fenced as untrusted. Without a key, offline ideas work and nothing is sent.")
+    st.write("**Cookies / tracking:** this Streamlit app sets no marketing cookies and no analytics in this phase.")
+    st.subheader("Terms of Use")
+    st.write("This planner is a free demo for Hack2Skill Challenge 5. It does not book vendors, charge payments, send invitations or guarantee availability — "
+             "always confirm venues, vendors and allergens yourself. Mock previews are labelled and do nothing real. Use it at your own discretion; the project is provided as-is.")
 
 
 main()
