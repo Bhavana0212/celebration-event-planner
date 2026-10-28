@@ -7,7 +7,7 @@ APP = str(Path(__file__).resolve().parents[1] / "app.py")
 def test_top_navigation_exists():
     at = AppTest.from_file(APP, default_timeout=60).run()
     assert not at.exception
-    assert any(r.label == "Choose a section" for r in at.radio)
+    assert any(s.label == "Navigate to a page" for s in at.selectbox)
 
 def test_sidebar_has_no_form_and_wizard_lands_on_plan():
     at = AppTest.from_file(APP, default_timeout=60).run()
