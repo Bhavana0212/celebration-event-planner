@@ -5,7 +5,7 @@ TEXT = (Path(__file__).resolve().parents[1] / "app.py").read_text()
 def test_hero_start_here():
     assert "First time here? Start here" in TEXT
     assert "See an example first" in TEXT
-    assert "Only 5 things are needed" in TEXT
+    assert "7-step wizard" in TEXT
 
 def test_page_guide_and_empty_state():
     assert "What to do on each page" in TEXT

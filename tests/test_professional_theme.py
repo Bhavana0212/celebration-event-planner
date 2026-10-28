@@ -13,6 +13,7 @@ def test_theme_file_and_loader():
     assert "1180px" in CSS
 
 def test_config_is_professional_not_generic():
-    assert "#9D174D" in CFG
-    assert "#111827" in CFG
-    assert "#F9FAFB" in CFG
+    # Superseded by premium polish: Forest/Champagne/Ivory, not deep magenta.
+    assert "#24352E" in CFG
+    assert "#30343B" in CFG
+    assert "#F7F3ED" in CFG

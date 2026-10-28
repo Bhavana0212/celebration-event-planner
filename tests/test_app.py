@@ -13,9 +13,10 @@ def test_app_loads_without_errors():
 
 
 def test_submitting_form_builds_plan():
-    # v3 uses sidebar navigation (radio), not tabs. Just check the form
-    # submit does not crash and a plan is created in session state.
+    # Premium polish: the wizard on Home (not a sidebar form) creates a plan.
     at = AppTest.from_file(APP, default_timeout=30).run()
-    at.sidebar.button[0].click().run()
+    for _ in range(6):
+        at.button(key="wiz_next").click().run()
+    at.button(key="wiz_create").click().run()
     assert not at.exception
     assert at.session_state.get("plan") is not None
