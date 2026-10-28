@@ -153,7 +153,22 @@ def render_home(plan: Plan | None) -> None:
     st.write("Birthdays, weddings, festivals and community events — tell us about "
              "your party, and get a complete plan — budget, guests, vendors, food, "
              "music and games — in minutes. No account needed.")
+    st.info("🆕 **First time here? Start here — 3 steps, about 2 minutes:**\n"
+            "**1.** Tap the example below (1 tap, no form) OR fill the short form below it.\n"
+            "**2.** Click 'Create my full plan' — your full plan opens by itself on the Plan page.\n"
+            "**3.** Use the menu at the top to add guests, track budget, and share invitations. No login, no payment, nothing to install.")
+    if st.button("👀 See an example first — 1 tap, no form needed", type="primary", key="hero_sample"):
+        req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
+                           "Toronto", "Fun & Playful", (), (), False,
+                           "Space theme, kids love science",
+                           event_name="Ava's 10th Birthday Bash", currency="CAD")
+        st.session_state["theme"] = "Space"
+        st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
+        st.session_state.pop("ai_text", None)
+        st.session_state["pending_section"] = "Plan"
+        st.rerun()
     st.subheader("Step 1 — Create your plan here (no sidebar needed)")
+    st.caption("Only 5 things are needed: event name, type, guests, budget, date. Everything else below is optional — skip it if you want.")
     st.caption("Fill this form and click 'Create my full plan'. Your complete plan — "
                "invitation, budget, checklist, schedule, vendors, food, games and shopping list — "
                "will open on the Plan page right away.")
@@ -192,6 +207,27 @@ def render_home(plan: Plan | None) -> None:
         if st.button("See my full plan →", type="primary", key="see_full_plan"):
             st.session_state["pending_section"] = "Plan"
             st.rerun()
+    st.caption("My own addition — one-click samples for other occasions too, so you can see a full wedding or community plan in one tap:")
+    if st.button("Try a sample wedding plan"):
+        req = EventRequest("Wedding", 150, 500000.0, date.today() + timedelta(days=120),
+                           "Toronto", "Elegant", (), (), False,
+                           "Elegant gold theme, evening reception",
+                           event_name="Aarav & Meera's Wedding", currency="CAD")
+        st.session_state["theme"] = "Elegant Gold"
+        st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
+        st.session_state.pop("ai_text", None)
+        st.session_state["pending_section"] = "Plan"
+        st.rerun()
+    if st.button("Try a sample community festival plan"):
+        req = EventRequest("Community Event", 200, 200000.0, date.today() + timedelta(days=45),
+                           "Toronto", "Fun & Playful", (), (), True,
+                           "Outdoor festival, food stalls and games",
+                           event_name="Neighbourhood Summer Festival", currency="CAD")
+        st.session_state["theme"] = "Rainbow / Fun"
+        st.session_state["plan"] = cached_plan(req.validated(date.today()), date.today())
+        st.session_state.pop("ai_text", None)
+        st.session_state["pending_section"] = "Plan"
+        st.rerun()
     if st.button("Try a sample birthday plan", type="primary"):
         req = EventRequest("Birthday", 50, 100000.0, date.today() + timedelta(days=60),
                            "Toronto", "Fun & Playful", (), (), False,
@@ -243,12 +279,44 @@ def render_home(plan: Plan | None) -> None:
     if plan is not None:
         st.success(f"Current event: **{plan.request.event_name or plan.request.event_type}** — "
                    f"{plan.days_left} days to go. Use the section menu at the top of the page to manage it.")
+        st.subheader("Your plan readiness — at a glance")
+        _guests = len(store("real_guests", []))
+        _att = sum(1 for g in store("real_guests", []) if g.get("RSVP") == "Attending")
+        _exp = len(store("expenses", []))
+        _ven = len(store("custom_vendors", []))
+        _tasks_done = sum(1 for x in store("custom_tasks", []) if x.get("done"))
+        _tasks_all = len(store("custom_tasks", []))
+        _checks = [bool(_guests), bool(_exp), bool(_ven), _tasks_all > 0 and _tasks_done == _tasks_all]
+        st.progress(sum(_checks) / len(_checks), text=f"Readiness: {sum(_checks)} of {len(_checks)} areas started/finished")
+        rc1, rc2, rc3, rc4 = st.columns(4)
+        rc1.metric("Guests listed", _guests); rc2.metric("Attending", _att)
+        rc3.metric("Expenses tracked", _exp); rc4.metric("Vendors added", _ven)
+        st.caption("Readiness is a simple progress count (guests, expenses, vendors, my tasks) — not a quality score, and not ticket sales.")
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Event types", str(len(EVENT_TYPES)))
         c2.metric("Budget categories", str(len(BUDGET_CATEGORIES)))
         c3.metric("Sample vendors", str(len(SAMPLE_VENDORS)))
         c4.metric("Games in library", str(len(GAMES_LIBRARY)))
+    st.subheader("Why this one — free, all-in-one, for every event")
+    st.write("Eventbrite is best for paid public tickets (with per-ticket fees). Partiful is best for stylish casual invites. "
+             "Zola is best for weddings only, with a real gift shop. This planner is different: it is **free, needs no account, "
+             "covers every event type, and puts budget, guests, vendors, food, games, seating and memories in one place** — "
+             "with structured data competitors miss (dietary that actually filters the menu, plus-ones counted, budget that always adds up). "
+             "It does NOT sell tickets or gifts — those need paid gateways, and are not faked here.")
+    st.subheader("What to do on each page — in plain words")
+    st.write("**Home:** Start here — form or 1-tap example.  •  **Plan:** Your full plan, budget and checklist.  •  "
+             "**Guests:** Add guests, see RSVP, copy invitation, share on WhatsApp.  •  **Budget:** Add what you actually spent, see what is left.  •  "
+             "**Food:** Menu, cake size, leftovers.  •  **Music & Games:** Playlist, games, scores.  •  **Kids:** Activities by age.  •  "
+             "**Decor:** Themes and colours.  •  **Vendors:** Compare vendors, add your own.  •  **Seating:** Who sits where.  •  "
+             "**Live Day:** On the day — check-in, polls, announcements.  •  **Post-Event:** Photos, guestbook, final report.  •  "
+             "**AI Assistant:** Ask a question about your event.  •  **Profile:** Backup and delete your data.  •  "
+             "**Previews:** Mock views of future features, labelled as previews.")
+    with st.expander("How to use this website in 30 seconds (read this first)"):
+        st.write("1. Open the link. No login.\n2. Tap 'See an example first' OR fill the form and click 'Create my full plan'.\n"
+                 "3. Your plan opens on the Plan page — invitation, budget, checklist, schedule, vendors, food, games, all in one place.\n"
+                 "4. Tap a name in the top menu to change that part — e.g. Guests to add people, Budget to add expenses.\n"
+                 "5. When done, go to Post-Event to download your plan (PDF / Markdown / calendar) or share the WhatsApp summary from Plan.")
     st.subheader("How it works")
     a, b, c = st.columns(3)
     with a.container(border=True):
@@ -331,6 +399,13 @@ def render_home(plan: Plan | None) -> None:
 
 
 def render_plan(plan: Plan) -> None:
+    # My own addition: celebrate a new plan once, then never again in this session.
+    if not st.session_state.get("celebrated_plan"):
+        st.session_state["celebrated_plan"] = True
+        try:
+            st.balloons()
+        except Exception:
+            pass
     r, b = plan.request, plan.budget
     cur = r.currency
     c1, c2, c3, c4 = st.columns(4)
@@ -339,6 +414,14 @@ def render_plan(plan: Plan) -> None:
     c3.metric("Budget per guest", money(b.per_head, cur))
     c4.metric("Budget level", b.tier)
     st.info(b.advice)
+    st.subheader("Share your plan summary")
+    _summary = (f"{r.event_name or r.event_type} — {r.event_date.isoformat()}"
+                f"{(' at ' + r.event_time) if r.event_time else ''} in {r.city or 'TBC'}, "
+                f"{r.guests} guests, budget {money(r.budget, r.currency)}. "
+                f"Plan: {'; '.join(t.title for t in plan.timeline[:3])}. "
+                f"Budget split: {', '.join(f'{line.category} {money(line.amount, r.currency)}' for line in b.lines[:3])}…")
+    st.markdown(f"[Share this plan summary on WhatsApp]({whatsapp_link('', _summary)})")
+    st.caption("My own addition: one link that summarises your whole plan for WhatsApp — the app sends nothing itself, you send it from your own WhatsApp.")
     st.subheader("Your next three actions")
     for task in plan.timeline[:3]:
         st.markdown(f"- **{task.title}** ({STATUS_ICON[task.status]}, by {task.due:%d %b %Y})")
@@ -401,10 +484,28 @@ def render_plan(plan: Plan) -> None:
     for course, dishes in plan.menu.items():
         st.markdown(f"**{course}:** " + "; ".join(dishes))
     st.caption("Always confirm allergens with your caterer.")
+    if plan.request.event_type == "Wedding":
+        st.subheader("Wedding planner — ceremony, reception, outfits, rings, honeymoon fund")
+        st.caption("Wedding-only checklist (Zola-style, but free and without a real gift shop): tick what is done, in this session.")
+        for item in ["Ceremony venue + officiant confirmed", "Reception venue + menu confirmed",
+                     "Bridal + groom outfits + fittings scheduled", "Rings ordered",
+                     "Photographer + videographer shot list shared", "Honeymoon fund / gift registry items listed (tracker only, no purchase here)",
+                     "Guest transport + accommodation coordinated", "Rehearsal dinner planned"]:
+            st.checkbox(item, key=f"wedding_{item}")
     st.subheader("Full plan at a glance — invitation, schedule, vendors, shopping, games, music")
     st.caption("Everything from your details, on one page — so you do not have to open every section to see the plan.")
     st.markdown("**Invitation (ready to copy)**")
     st.text_area("Your invitation", invitation_text(plan.request, st.session_state.get("theme", "")), height=150, key="fullplan_invite")
+    _theme = st.session_state.get("theme", "Space")
+    _pal = THEMES.get(_theme, {"colors": ["#C026D3", "#FDF2F8", "#FFFFFF", "#1B2A4E"]})["colors"]
+    _ev_name = plan.request.event_name or f"{plan.request.event_type} Celebration"
+    st.markdown(f"""<div style="background:{_pal[1]};border:3px solid {_pal[0]};border-radius:16px;padding:24px;text-align:center">
+<h2 style="color:{_pal[0]};margin:0">🎉 {_ev_name} 🎉</h2>
+<p style="font-size:18px;margin:8px 0">{plan.request.event_type} • {plan.request.event_date.isoformat()}{(' • ' + plan.request.event_time) if plan.request.event_time else ''}</p>
+<p style="margin:4px 0">{plan.request.city or 'Venue to be confirmed'} • {plan.request.guests} guests • Theme: {_theme}</p>
+<p style="margin:4px 0">You are invited! Please RSVP so we can plan food, seating and return gifts for everyone.</p>
+</div>""", unsafe_allow_html=True)
+    st.caption("Stylish invitation preview — design only. Share it via WhatsApp / email links in Guests & Invites; this app sends no message itself.")
     st.markdown("**Day schedule**")
     for title, detail in day_schedule(plan.request.event_type):
         st.write(f"- **{title}:** {detail}")
@@ -492,6 +593,9 @@ def render_guests(plan: Plan) -> None:
         c2.metric("Attending", counts.get("Attending", 0))
         c3.metric("Pending / Maybe", counts.get("Pending", 0) + counts.get("Maybe", 0))
         c4.metric("Checked in", int(edited["CheckedIn"].sum()) if "CheckedIn" in edited else 0)
+        st.subheader("RSVP summary (chart)")
+        st.bar_chart(counts)
+        st.caption("Structured RSVP summary: Attending / Pending / Maybe / Declined counts from your guest list — unlike casual invite apps, dietary and plus-ones are stored per guest too.")
         buf = io.StringIO()
         edited.to_csv(buf, index=False)
         st.download_button("⬇️ Download guest list (CSV)", buf.getvalue(), "guest-list.csv", "text/csv")
@@ -1214,8 +1318,8 @@ def main() -> None:
     elif section == "Previews (Mock)":
         render_previews()
     elif plan is None:
+        st.info("First step: create a plan on Home below — fill the short form at the top, or tap 'See an example first' (1 tap). Then this section will open with your plan.")
         render_home(None)
-        st.warning("Create a plan from the sidebar form (or try a sample plan on Home) to use this section.")
     elif section == "Plan":
         render_plan(plan)
     elif section == "Guests & Invites":

@@ -169,3 +169,59 @@ evaluators, so they are listed honestly as the next phase instead.
 - Tests: 174 pass (172 + 2 new top-nav tests); AppTest verified top nav
   exists, sidebar submit lands on Plan, and the full-plan heading +
   invitation appear.
+
+## Best-in-market batch (2026-10-27, after Eventbrite / Partiful / Zola comparison)
+- Honest positioning on Home: Eventbrite = paid public tickets (with fees),
+  Partiful = stylish casual invites, Zola = weddings only with a real gift
+  shop. This planner's edge, stated plainly: free, no account, every event
+  type, budget+guests+vendors+food+games+seating+memories in one place,
+  with structured data (dietary filters the menu, plus-ones counted,
+  budget always adds up). It does NOT sell tickets or gifts.
+- Plan readiness dashboard on Home (when a plan exists): guests listed,
+  attending, expenses tracked, vendors added, plus a simple progress bar
+  over 4 areas — labelled as a progress count, not a quality score.
+- Stylish invitation preview card on Plan (theme colours, event name,
+  date/time, city, guests, theme) — Partiful-style design, but share via
+  the existing WhatsApp/email links; the app sends nothing itself.
+- RSVP summary chart on Guests (Attending/Pending/Maybe/Declined counts).
+- Wedding-only checklist on Plan when event type is Wedding: ceremony,
+  reception, outfits, rings, shot list, honeymoon-fund tracker (no purchase),
+  transport/accommodation, rehearsal dinner.
+- Tests: 177 pass (174 + 3 new best-batch tests).
+- NOT yet uploaded at commit time: the top-nav GitHub upload was still
+  running, so this batch uploads after it to avoid conflicting web edits.
+
+## My own additions batch (2026-10-27, user said "add something of your own")
+- One-click sample plans for Wedding (Aarav & Meera's Wedding, 150 guests,
+  Elegant Gold) and Community Festival (Neighbourhood Summer Festival,
+  200 guests, outdoor, Rainbow / Fun) on Home, next to the birthday
+  sample — so a visitor can see a full plan for three occasions in one tap.
+- WhatsApp plan summary on Plan: one link with event, date/time, city,
+  guests, budget, next three tasks and top budget lines — the app sends
+  nothing itself, the user sends it from their own WhatsApp.
+- One-time celebration: balloons once when a plan first opens in a
+  session, then never again in that session (session flag, not on every
+  Plan view).
+- Tests: 179 pass (177 + 2 new my-additions tests).
+- NOT yet uploaded at commit time: the best-in-market GitHub upload was
+  still running, so this batch uploads after it to avoid conflicting
+  web edits.
+
+## Easily-accessible batch (2026-10-27, after searching best event sites for usability)
+- Research learnings applied (EventCreate/RSVPify fast onboarding, Luma
+  under-2-minute event page with no account for guests, Partiful single-page
+  setup vs multi-tab setup, and standard usability rules: one clear hero,
+  one clear CTA, tell the visitor exactly what to do next, short forms,
+  step-by-step instructions before the task):
+  - Home hero "First time here? Start here — 3 steps, about 2 minutes"
+    with a 1-tap example button at the very top, before any form.
+  - Main form labelled: only 5 things needed (name, type, guests, budget,
+    date); everything else optional and skippable.
+  - "What to do on each page — in plain words" guide on Home, plus a
+    30-second "How to use this website" expander with the exact 5 steps.
+  - Empty-state guidance moved to the TOP when a section is opened
+    without a plan (previously a warning after the whole Home page).
+- Tests: 181 pass (179 + 2 new accessibility tests).
+- NOT yet uploaded at commit time: the best-in-market GitHub upload was
+  still running (after a re-grant), so this batch uploads after it to
+  avoid conflicting web edits.
