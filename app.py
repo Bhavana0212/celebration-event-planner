@@ -184,25 +184,35 @@ def render_journey() -> None:
     st.write("Follow these steps in order, one by one. When the last step is done, your whole event is set — nothing left hanging.")
     flags = journey_done_flags()
     done = sum(flags)
-    st.progress(done / len(JOURNEY_STEPS))
+    pct = round(100 * done / len(JOURNEY_STEPS))
+    st.progress(done / len(JOURNEY_STEPS), text=f"{pct}% complete — {done} of {len(JOURNEY_STEPS)} steps done")
     if done == len(JOURNEY_STEPS):
         st.success("🎉 All steps done — your event is fully set! Now enjoy the celebration.")
     else:
         nxt = next(i for i, f in enumerate(flags) if not f)
         st.write(f"**Your progress: {done} of {len(JOURNEY_STEPS)} steps done. Next step: {JOURNEY_STEPS[nxt][0]}**")
-    # Horizontal process graph: Step 1 → Step 2 → … (wraps on mobile),
-    # done = ✓ magenta, current = gold ring, upcoming = grey. No table,
-    # no "Pending" column — the graph itself shows where you are.
+    # Progress tracker, screenshot-reference style (own design, no copied
+    # logo/artwork): icon circles joined by one line, like a delivery
+    # tracker - done = magenta circle with check, current = gold circle
+    # with play mark, upcoming = grey circle with its number. Short labels
+    # keep it to one scrollable line; the 3-column step cards below still
+    # hold the full descriptions and Open buttons.
     plan = st.session_state.get("plan")
     next_idx = next((j for j, f in enumerate(flags) if not f), -1)
+    TRACKER = [("🎉", "Planning"), ("👥", "Guests"), ("💰", "Budget"),
+               ("✉️", "Invitation"), ("🎨", "Decor"), ("🍰", "Food"),
+               ("🎵", "Music"), ("🛍️", "Vendors"), ("🪑", "Seating"),
+               ("🧒", "Kids"), ("🎤", "Live Day"), ("💌", "Memories")]
     cards = []
-    for i, ((title, _target, _what), is_done) in enumerate(zip(JOURNEY_STEPS, flags)):
+    for i, ((icon, short), is_done) in enumerate(zip(TRACKER, flags)):
         cls = "done" if is_done else ("current" if i == next_idx else "upcoming")
-        mark = "✓" if is_done else ("▶" if i == next_idx else str(i + 1))
-        cards.append(f'<div class="step {cls}"><span class="step-mark">{mark}</span><span class="step-title">{title}</span></div>')
-    stepper = '<div class="stepper">' + '<span class="step-arrow">→</span>'.join(cards) + "</div>"
-    st.markdown(stepper, unsafe_allow_html=True)
-    st.caption("✓ = done in that section  •  ▶ = your next step  •  numbered = coming up. "
+        # Screenshot style: the ICON sits inside the circle (like the pizza
+        # delivery tracker), not a number. Done = magenta circle with a check.
+        mark = "✓" if is_done else icon
+        cards.append(f'<div class="track-step {cls}"><span class="track-circle">{mark}</span>'
+                     f'<span class="track-label">{short}</span></div>')
+    st.markdown('<div class="stepper progress-tracker">' + "".join(cards) + "</div>", unsafe_allow_html=True)
+    st.caption("✓ in a magenta circle = done  •  gold ring = your next step  •  grey circle = coming up. "
                "A step turns ✓ only when you actually do it (add a guest, add an expense, add a vendor, and so on). "
                "Steps 1 and 4 are ready with your plan itself, because the plan generates the checklist and the invitation.")
     # Step cards in a 3-column grid — tap a step to open its page.
