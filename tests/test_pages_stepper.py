@@ -8,6 +8,7 @@ def test_top_navbar_is_selectbox_and_footer_exists():
     assert 'st.selectbox("Navigate to a page"' in TEXT
     assert "def render_footer" in TEXT
     assert "pro-footer" in CSS
+    assert TEXT.count("render_footer()") >= 2  # defined AND called at the end of main()
 
 def test_info_pages_exist():
     for page in ["About", "Services", "Pricing", "FAQ", "Reviews", "Contact", "Privacy & Terms"]:
