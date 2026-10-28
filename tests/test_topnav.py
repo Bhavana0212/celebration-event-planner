@@ -1,4 +1,4 @@
-"""Top nav + wizard: navigation is at the top, sidebar has no form, wizard creates a plan."""
+"""Top nav + wizard: navigation is at the top, open and horizontal, sidebar has no form, wizard creates a plan."""
 from pathlib import Path
 from streamlit.testing.v1 import AppTest
 
@@ -7,7 +7,9 @@ APP = str(Path(__file__).resolve().parents[1] / "app.py")
 def test_top_navigation_exists():
     at = AppTest.from_file(APP, default_timeout=60).run()
     assert not at.exception
-    assert any(s.label == "Navigate to a page" for s in at.selectbox)
+    # Open nav, not a dropdown: a horizontal radio bar labelled Navigate.
+    assert any(s.label == "Navigate" for s in at.radio)
+    assert not any(s.label == "Navigate to a page" for s in at.selectbox)
 
 def test_sidebar_has_no_form_and_wizard_lands_on_plan():
     at = AppTest.from_file(APP, default_timeout=60).run()
