@@ -4,8 +4,11 @@ ROOT = Path(__file__).resolve().parents[1]
 TEXT = (ROOT / "app.py").read_text()
 CSS = (ROOT / "assets" / "professional-theme.css").read_text()
 
-def test_top_navbar_is_selectbox_and_footer_exists():
-    assert 'st.selectbox("Navigate to a page"' in TEXT
+def test_top_navbar_is_open_radio_and_footer_exists():
+    # Open one-line nav, not a dropdown: horizontal radio, header/footer on every page.
+    assert 'st.radio("Navigate"' in TEXT
+    assert "horizontal=True" in TEXT
+    assert 'st.selectbox("Navigate to a page"' not in TEXT
     assert "def render_footer" in TEXT
     assert "pro-footer" in CSS
     assert TEXT.count("render_footer()") >= 2  # defined AND called at the end of main()
