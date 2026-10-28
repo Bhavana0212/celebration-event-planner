@@ -336,3 +336,9 @@ evaluators, so they are listed honestly as the next phase instead.
 - Contact now includes Bhavana Shah's LinkedIn link (https://www.linkedin.com/in/bhavana-shah-875a85137), opening in the user's own app/browser; app still sends nothing.
 - FAQ is now general questions (What is this website? Who can use it? Is it free? Do I need an account? How do I start? Can I use it on my phone? plus wedding, privacy, keep-plan, booking/payment honesty).
 - Tests: new test_open_nav.py (4 tests); test_topnav and test_pages_stepper updated from selectbox to open radio nav. Total local test count to be re-checked after a full run — do not quote 195 until that run passes.
+
+## 2026-10-28 — Design improvement batch (user feedback: nav/progress designs sent, but no visible improvement)
+- Why the previous tracker/header did not look improved: the radio widget still showed its form circles, and the tracker line was the same gold for every step, so the clean header / filled progress did not actually show.
+- Fixed: radio circles are hidden (input[type="radio"] display:none), every nav option is now a clean pill link in a white shadow bar, current page is a magenta pill with white text, hover is light pink — TOOFAN-style clean header, own palette, no copied logo/artwork.
+- Journey tracker is now a real progress bar: icon inside each circle (not a number), done = magenta circle with ✓, current = larger gold-ring circle, upcoming = grey circle, connecting line is magenta for done steps, gradient for the current step, grey for upcoming, tracker sits in a white card, and wizard/progress bars use a magenta→gold gradient.
+- Tests: new test_design_progress_header.py (4 tests) + test_progress_header.py (2 tests, progress tracker + clean white header); both pass locally by manual run, full AppTest run still needs CI.
