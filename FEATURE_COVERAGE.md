@@ -225,3 +225,28 @@ evaluators, so they are listed honestly as the next phase instead.
 - NOT yet uploaded at commit time: the best-in-market GitHub upload was
   still running (after a re-grant), so this batch uploads after it to
   avoid conflicting web edits.
+
+## Professional theme batch (2026-10-28, user: replace Streamlit generic theme)
+- Well-architected split: look is now separate from logic —
+  assets/professional-theme.css holds the theme, planner/ holds the
+  engine, app.py holds screens. Theme loads via load_professional_theme()
+  at the start of main(); if the CSS file is missing, the app still
+  works with Streamlit's default look (no crash).
+- Professional look (still festive, not corporate navy): deep magenta
+  accent #9D174D (was bright #C026D3), white background, light-grey
+  sidebar #F9FAFB, dark text #111827, Inter/system font stack, content
+  capped at 1180px with breathing room, card-style metrics (white card,
+  border, soft shadow, rounded corners), rounded buttons with a magenta
+  gradient primary button, rounded inputs with magenta focus ring,
+  rounded expanders/alerts.
+- Proper layout: a slim professional site header at the top of every
+  page (brand + "Free · No account · Every event, one plan"), then the
+  horizontal section menu, then the page content — like a real product
+  header, not a bare Streamlit page.
+- Tests: 183 pass (181 + 2 new professional-theme tests); AppTest run
+  verified: no exception, theme <style> and pro-header markdown present.
+- NOT yet uploaded at commit time: the best-in-market GitHub upload was
+  still running, so this batch uploads after it to avoid conflicting
+  web edits. Files to upload: app.py, .streamlit/config.toml,
+  assets/professional-theme.css (new), tests/test_professional_theme.py
+  (new), FEATURE_COVERAGE.md.
