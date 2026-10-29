@@ -12,7 +12,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Hack2Skill-PromptWars%20Challenge%205-FF6B6B?style=for-the-badge" alt="Hack2Skill PromptWars Challenge 5">
   <img src="https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B?style=for-the-badge" alt="Built with Streamlit">
-  <img src="https://img.shields.io/badge/Tests-107%20passing-6BCB77?style=for-the-badge" alt="107 tests passing">
+  <img src="https://img.shields.io/badge/Tests-207%20passing-6BCB77?style=for-the-badge" alt="207 tests passing">
   <img src="https://img.shields.io/badge/GenAI-Google%20Gemini-4D96FF?style=for-the-badge" alt="Google Gemini">
   <img src="https://img.shields.io/badge/Python-3.11%2B-FFD93D?style=for-the-badge" alt="Python 3.11+">
 </p>
@@ -27,9 +27,14 @@
 > See [`FEATURE_COVERAGE.md`](FEATURE_COVERAGE.md) for an honest map of what v3 does,
 > what is partial/simulated, and what is a next phase (payments, 3D/AR, real accounts,
 > real bookings). Do not claim next-phase features as done.
-
+>
+ 
+**Live app:** https://celebration-event-planner.streamlit.app/
+**Demo video:** https://youtu.be/6PeAQ6ExOPQ?si=egaPPVMfc7wnC7w3 
+**LinkedIn:** https://www.linkedin.com/in/bhavana-shah-875a85137
 ## ✨ What it does
 
+ 
 Turn a few details into a complete, context-aware plan — and a website you can
 actually launch: a landing page, a plan builder, guest and vendor managers,
 a budget tracker, and exports.
@@ -59,7 +64,7 @@ streamlit run app.py
 pytest -q
 ```
 
-**Live demo:** https://sufuuqiqx6n4vnqrsufv6q.streamlit.app/
+**Live demo:** https://celebration-event-planner.streamlit.app/
 — deployed on Streamlit Cloud from this repo (branch `main`, file `app.py`).
 No account needed; data stays in your browser session unless you download it.
 
